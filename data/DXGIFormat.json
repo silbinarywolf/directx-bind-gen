@@ -1,0 +1,620 @@
+{
+  "Filename": "DXSDK_Jun10/include/DXGIFormat.h",
+  "Structs": null,
+  "Functions": null,
+  "TypeAliases": null,
+  "VtblStructs": null,
+  "Enums": [
+    {
+      "Ident": "DXGI_FORMAT",
+      "Fields": [
+        {
+          "Ident": "DXGI_FORMAT_UNKNOWN",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32B32A32_TYPELESS",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32B32A32_FLOAT",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32B32A32_UINT",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32B32A32_SINT",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32B32_TYPELESS",
+          "RawValue": "5",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32B32_FLOAT",
+          "RawValue": "6",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32B32_UINT",
+          "RawValue": "7",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32B32_SINT",
+          "RawValue": "8",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16B16A16_TYPELESS",
+          "RawValue": "9",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16B16A16_FLOAT",
+          "RawValue": "10",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16B16A16_UNORM",
+          "RawValue": "11",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16B16A16_UINT",
+          "RawValue": "12",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16B16A16_SNORM",
+          "RawValue": "13",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16B16A16_SINT",
+          "RawValue": "14",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32_TYPELESS",
+          "RawValue": "15",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32_FLOAT",
+          "RawValue": "16",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32_UINT",
+          "RawValue": "17",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G32_SINT",
+          "RawValue": "18",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32G8X24_TYPELESS",
+          "RawValue": "19",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_D32_FLOAT_S8X24_UINT",
+          "RawValue": "20",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS",
+          "RawValue": "21",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_X32_TYPELESS_G8X24_UINT",
+          "RawValue": "22",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R10G10B10A2_TYPELESS",
+          "RawValue": "23",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R10G10B10A2_UNORM",
+          "RawValue": "24",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R10G10B10A2_UINT",
+          "RawValue": "25",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R11G11B10_FLOAT",
+          "RawValue": "26",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8B8A8_TYPELESS",
+          "RawValue": "27",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8B8A8_UNORM",
+          "RawValue": "28",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8B8A8_UNORM_SRGB",
+          "RawValue": "29",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8B8A8_UINT",
+          "RawValue": "30",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8B8A8_SNORM",
+          "RawValue": "31",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8B8A8_SINT",
+          "RawValue": "32",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16_TYPELESS",
+          "RawValue": "33",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16_FLOAT",
+          "RawValue": "34",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16_UNORM",
+          "RawValue": "35",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16_UINT",
+          "RawValue": "36",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16_SNORM",
+          "RawValue": "37",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16G16_SINT",
+          "RawValue": "38",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32_TYPELESS",
+          "RawValue": "39",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_D32_FLOAT",
+          "RawValue": "40",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32_FLOAT",
+          "RawValue": "41",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32_UINT",
+          "RawValue": "42",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R32_SINT",
+          "RawValue": "43",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R24G8_TYPELESS",
+          "RawValue": "44",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_D24_UNORM_S8_UINT",
+          "RawValue": "45",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R24_UNORM_X8_TYPELESS",
+          "RawValue": "46",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_X24_TYPELESS_G8_UINT",
+          "RawValue": "47",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8_TYPELESS",
+          "RawValue": "48",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8_UNORM",
+          "RawValue": "49",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8_UINT",
+          "RawValue": "50",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8_SNORM",
+          "RawValue": "51",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8_SINT",
+          "RawValue": "52",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16_TYPELESS",
+          "RawValue": "53",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16_FLOAT",
+          "RawValue": "54",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_D16_UNORM",
+          "RawValue": "55",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16_UNORM",
+          "RawValue": "56",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16_UINT",
+          "RawValue": "57",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16_SNORM",
+          "RawValue": "58",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R16_SINT",
+          "RawValue": "59",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8_TYPELESS",
+          "RawValue": "60",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8_UNORM",
+          "RawValue": "61",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8_UINT",
+          "RawValue": "62",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8_SNORM",
+          "RawValue": "63",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8_SINT",
+          "RawValue": "64",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_A8_UNORM",
+          "RawValue": "65",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R1_UNORM",
+          "RawValue": "66",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R9G9B9E5_SHAREDEXP",
+          "RawValue": "67",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R8G8_B8G8_UNORM",
+          "RawValue": "68",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_G8R8_G8B8_UNORM",
+          "RawValue": "69",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC1_TYPELESS",
+          "RawValue": "70",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC1_UNORM",
+          "RawValue": "71",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC1_UNORM_SRGB",
+          "RawValue": "72",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC2_TYPELESS",
+          "RawValue": "73",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC2_UNORM",
+          "RawValue": "74",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC2_UNORM_SRGB",
+          "RawValue": "75",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC3_TYPELESS",
+          "RawValue": "76",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC3_UNORM",
+          "RawValue": "77",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC3_UNORM_SRGB",
+          "RawValue": "78",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC4_TYPELESS",
+          "RawValue": "79",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC4_UNORM",
+          "RawValue": "80",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC4_SNORM",
+          "RawValue": "81",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC5_TYPELESS",
+          "RawValue": "82",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC5_UNORM",
+          "RawValue": "83",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC5_SNORM",
+          "RawValue": "84",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_B5G6R5_UNORM",
+          "RawValue": "85",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_B5G5R5A1_UNORM",
+          "RawValue": "86",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_B8G8R8A8_UNORM",
+          "RawValue": "87",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_B8G8R8X8_UNORM",
+          "RawValue": "88",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM",
+          "RawValue": "89",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_B8G8R8A8_TYPELESS",
+          "RawValue": "90",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_B8G8R8A8_UNORM_SRGB",
+          "RawValue": "91",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_B8G8R8X8_TYPELESS",
+          "RawValue": "92",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_B8G8R8X8_UNORM_SRGB",
+          "RawValue": "93",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC6H_TYPELESS",
+          "RawValue": "94",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC6H_UF16",
+          "RawValue": "95",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC6H_SF16",
+          "RawValue": "96",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC7_TYPELESS",
+          "RawValue": "97",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC7_UNORM",
+          "RawValue": "98",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_BC7_UNORM_SRGB",
+          "RawValue": "99",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DXGI_FORMAT_FORCE_UINT",
+          "RawValue": "0xffffffff",
+          "UInt32Value": 4294967295,
+          "StringValue": null
+        }
+      ]
+    }
+  ]
+}

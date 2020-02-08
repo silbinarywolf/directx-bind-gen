@@ -1,0 +1,2585 @@
+{
+  "Filename": "DXSDK_Jun10/include/D3Dcommon.h",
+  "Structs": [
+    {
+      "Ident": "_SHADER_MACRO",
+      "Fields": [
+        {
+          "TypeInfo": {
+            "Name": "Pointer",
+            "Type": {
+              "TypeInfo": {
+                "Name": "byte",
+                "Type": {},
+                "Ident": "LPCSTR",
+                "GoType": ""
+              },
+              "Depth": 1
+            },
+            "Ident": "LPCSTR",
+            "GoType": "**byte"
+          },
+          "Name": "Name",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "Pointer",
+            "Type": {
+              "TypeInfo": {
+                "Name": "byte",
+                "Type": {},
+                "Ident": "LPCSTR",
+                "GoType": ""
+              },
+              "Depth": 1
+            },
+            "Ident": "LPCSTR",
+            "GoType": "**byte"
+          },
+          "Name": "Definition",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        }
+      ],
+      "NonVtblIdent": ""
+    },
+    {
+      "Ident": "ID3D10Blob",
+      "Fields": [
+        {
+          "TypeInfo": {
+            "Name": "Pointer",
+            "Type": {
+              "TypeInfo": {
+                "Name": "Basic",
+                "Type": {},
+                "Ident": "CONST_VTBL struct ID3D10BlobVtbl",
+                "GoType": ""
+              },
+              "Depth": 1
+            },
+            "Ident": "CONST_VTBL struct ID3D10BlobVtbl",
+            "GoType": "*ID3D10BlobVtbl"
+          },
+          "Name": "lpVtbl",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        }
+      ],
+      "NonVtblIdent": ""
+    }
+  ],
+  "Functions": null,
+  "TypeAliases": [
+    {
+      "Ident": "ID3DBlob",
+      "Alias": "ID3D10Blob"
+    }
+  ],
+  "VtblStructs": [
+    {
+      "Ident": "ID3D10BlobVtbl",
+      "Fields": [
+        {
+          "TypeInfo": {
+            "Name": "FunctionPointer",
+            "Type": {
+              "Ident": "QueryInterface",
+              "Parameters": [
+                {
+                  "TypeInfo": {
+                    "Name": "Pointer",
+                    "Type": {
+                      "TypeInfo": {
+                        "Name": "Basic",
+                        "Type": {},
+                        "Ident": "ID3D10Blob",
+                        "GoType": ""
+                      },
+                      "Depth": 1
+                    },
+                    "Ident": "ID3D10Blob",
+                    "GoType": "*ID3D10Blob"
+                  },
+                  "Name": "This",
+                  "IsOut": false,
+                  "HasECount": false,
+                  "IsArrayLen": false
+                },
+                {
+                  "TypeInfo": {
+                    "Name": "Basic",
+                    "Type": {},
+                    "Ident": "REFIID",
+                    "GoType": "uintptr"
+                  },
+                  "Name": "riid",
+                  "IsOut": false,
+                  "HasECount": false,
+                  "IsArrayLen": false
+                },
+                {
+                  "TypeInfo": {
+                    "Name": "Pointer",
+                    "Type": {
+                      "TypeInfo": {
+                        "Name": "Basic",
+                        "Type": {},
+                        "Ident": "void",
+                        "GoType": ""
+                      },
+                      "Depth": 2
+                    },
+                    "Ident": "void",
+                    "GoType": "uintptr"
+                  },
+                  "Name": "ppvObject",
+                  "IsOut": true,
+                  "HasECount": false,
+                  "IsArrayLen": false
+                }
+              ]
+            },
+            "Ident": "",
+            "GoType": "uintptr"
+          },
+          "Name": "QueryInterface",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "FunctionPointer",
+            "Type": {
+              "Ident": "AddRef",
+              "Parameters": [
+                {
+                  "TypeInfo": {
+                    "Name": "Pointer",
+                    "Type": {
+                      "TypeInfo": {
+                        "Name": "Basic",
+                        "Type": {},
+                        "Ident": "ID3D10Blob",
+                        "GoType": ""
+                      },
+                      "Depth": 1
+                    },
+                    "Ident": "ID3D10Blob",
+                    "GoType": "*ID3D10Blob"
+                  },
+                  "Name": "This",
+                  "IsOut": false,
+                  "HasECount": false,
+                  "IsArrayLen": false
+                }
+              ]
+            },
+            "Ident": "",
+            "GoType": "uintptr"
+          },
+          "Name": "AddRef",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "FunctionPointer",
+            "Type": {
+              "Ident": "Release",
+              "Parameters": [
+                {
+                  "TypeInfo": {
+                    "Name": "Pointer",
+                    "Type": {
+                      "TypeInfo": {
+                        "Name": "Basic",
+                        "Type": {},
+                        "Ident": "ID3D10Blob",
+                        "GoType": ""
+                      },
+                      "Depth": 1
+                    },
+                    "Ident": "ID3D10Blob",
+                    "GoType": "*ID3D10Blob"
+                  },
+                  "Name": "This",
+                  "IsOut": false,
+                  "HasECount": false,
+                  "IsArrayLen": false
+                }
+              ]
+            },
+            "Ident": "",
+            "GoType": "uintptr"
+          },
+          "Name": "Release",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "FunctionPointer",
+            "Type": {
+              "Ident": "GetBufferPointer",
+              "Parameters": [
+                {
+                  "TypeInfo": {
+                    "Name": "Pointer",
+                    "Type": {
+                      "TypeInfo": {
+                        "Name": "Basic",
+                        "Type": {},
+                        "Ident": "ID3D10Blob",
+                        "GoType": ""
+                      },
+                      "Depth": 1
+                    },
+                    "Ident": "ID3D10Blob",
+                    "GoType": "*ID3D10Blob"
+                  },
+                  "Name": "This",
+                  "IsOut": false,
+                  "HasECount": false,
+                  "IsArrayLen": false
+                }
+              ]
+            },
+            "Ident": "",
+            "GoType": "uintptr"
+          },
+          "Name": "GetBufferPointer",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "FunctionPointer",
+            "Type": {
+              "Ident": "GetBufferSize",
+              "Parameters": [
+                {
+                  "TypeInfo": {
+                    "Name": "Pointer",
+                    "Type": {
+                      "TypeInfo": {
+                        "Name": "Basic",
+                        "Type": {},
+                        "Ident": "ID3D10Blob",
+                        "GoType": ""
+                      },
+                      "Depth": 1
+                    },
+                    "Ident": "ID3D10Blob",
+                    "GoType": "*ID3D10Blob"
+                  },
+                  "Name": "This",
+                  "IsOut": false,
+                  "HasECount": false,
+                  "IsArrayLen": false
+                }
+              ]
+            },
+            "Ident": "",
+            "GoType": "uintptr"
+          },
+          "Name": "GetBufferSize",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        }
+      ],
+      "NonVtblIdent": "ID3D10Blob"
+    }
+  ],
+  "Enums": [
+    {
+      "Ident": "DRIVER_TYPE",
+      "Fields": [
+        {
+          "Ident": "DRIVER_TYPE_UNKNOWN",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DRIVER_TYPE_HARDWARE",
+          "RawValue": "(DRIVER_TYPE_UNKNOWN+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DRIVER_TYPE_REFERENCE",
+          "RawValue": "(DRIVER_TYPE_HARDWARE+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DRIVER_TYPE_NULL",
+          "RawValue": "(DRIVER_TYPE_REFERENCE+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DRIVER_TYPE_SOFTWARE",
+          "RawValue": "(DRIVER_TYPE_NULL+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "DRIVER_TYPE_WARP",
+          "RawValue": "(DRIVER_TYPE_SOFTWARE+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "FEATURE_LEVEL",
+      "Fields": [
+        {
+          "Ident": "FEATURE_LEVEL_9_1",
+          "RawValue": "0x9100",
+          "UInt32Value": 37120,
+          "StringValue": null
+        },
+        {
+          "Ident": "FEATURE_LEVEL_9_2",
+          "RawValue": "0x9200",
+          "UInt32Value": 37376,
+          "StringValue": null
+        },
+        {
+          "Ident": "FEATURE_LEVEL_9_3",
+          "RawValue": "0x9300",
+          "UInt32Value": 37632,
+          "StringValue": null
+        },
+        {
+          "Ident": "FEATURE_LEVEL_10_0",
+          "RawValue": "0xa000",
+          "UInt32Value": 40960,
+          "StringValue": null
+        },
+        {
+          "Ident": "FEATURE_LEVEL_10_1",
+          "RawValue": "0xa100",
+          "UInt32Value": 41216,
+          "StringValue": null
+        },
+        {
+          "Ident": "FEATURE_LEVEL_11_0",
+          "RawValue": "0xb000",
+          "UInt32Value": 45056,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "PRIMITIVE_TOPOLOGY",
+      "Fields": [
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_UNDEFINED",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_POINTLIST",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_LINELIST",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_LINESTRIP",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_TRIANGLELIST",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_TRIANGLESTRIP",
+          "RawValue": "5",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_LINELIST_ADJ",
+          "RawValue": "10",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ",
+          "RawValue": "11",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ",
+          "RawValue": "12",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ",
+          "RawValue": "13",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST",
+          "RawValue": "33",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST",
+          "RawValue": "34",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST",
+          "RawValue": "35",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST",
+          "RawValue": "36",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_5_CONTROL_POINT_PATCHLIST",
+          "RawValue": "37",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_6_CONTROL_POINT_PATCHLIST",
+          "RawValue": "38",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_7_CONTROL_POINT_PATCHLIST",
+          "RawValue": "39",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_8_CONTROL_POINT_PATCHLIST",
+          "RawValue": "40",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_9_CONTROL_POINT_PATCHLIST",
+          "RawValue": "41",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_10_CONTROL_POINT_PATCHLIST",
+          "RawValue": "42",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_11_CONTROL_POINT_PATCHLIST",
+          "RawValue": "43",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST",
+          "RawValue": "44",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_13_CONTROL_POINT_PATCHLIST",
+          "RawValue": "45",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_14_CONTROL_POINT_PATCHLIST",
+          "RawValue": "46",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_15_CONTROL_POINT_PATCHLIST",
+          "RawValue": "47",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_16_CONTROL_POINT_PATCHLIST",
+          "RawValue": "48",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_17_CONTROL_POINT_PATCHLIST",
+          "RawValue": "49",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_18_CONTROL_POINT_PATCHLIST",
+          "RawValue": "50",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_19_CONTROL_POINT_PATCHLIST",
+          "RawValue": "51",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_20_CONTROL_POINT_PATCHLIST",
+          "RawValue": "52",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_21_CONTROL_POINT_PATCHLIST",
+          "RawValue": "53",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_22_CONTROL_POINT_PATCHLIST",
+          "RawValue": "54",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_23_CONTROL_POINT_PATCHLIST",
+          "RawValue": "55",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_24_CONTROL_POINT_PATCHLIST",
+          "RawValue": "56",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_25_CONTROL_POINT_PATCHLIST",
+          "RawValue": "57",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_26_CONTROL_POINT_PATCHLIST",
+          "RawValue": "58",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_27_CONTROL_POINT_PATCHLIST",
+          "RawValue": "59",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_28_CONTROL_POINT_PATCHLIST",
+          "RawValue": "60",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_29_CONTROL_POINT_PATCHLIST",
+          "RawValue": "61",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_30_CONTROL_POINT_PATCHLIST",
+          "RawValue": "62",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_31_CONTROL_POINT_PATCHLIST",
+          "RawValue": "63",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST",
+          "RawValue": "64",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_UNDEFINED",
+          "RawValue": "PRIMITIVE_TOPOLOGY_UNDEFINED",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_POINTLIST",
+          "RawValue": "PRIMITIVE_TOPOLOGY_POINTLIST",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_LINELIST",
+          "RawValue": "PRIMITIVE_TOPOLOGY_LINELIST",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_LINESTRIP",
+          "RawValue": "PRIMITIVE_TOPOLOGY_LINESTRIP",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
+          "RawValue": "PRIMITIVE_TOPOLOGY_TRIANGLELIST",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP",
+          "RawValue": "PRIMITIVE_TOPOLOGY_TRIANGLESTRIP",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_LINELIST_ADJ",
+          "RawValue": "PRIMITIVE_TOPOLOGY_LINELIST_ADJ",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ",
+          "RawValue": "PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ",
+          "RawValue": "PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ",
+          "RawValue": "PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "PRIMITIVE",
+      "Fields": [
+        {
+          "Ident": "PRIMITIVE_UNDEFINED",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_POINT",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_LINE",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TRIANGLE",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_LINE_ADJ",
+          "RawValue": "6",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_TRIANGLE_ADJ",
+          "RawValue": "7",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_1_CONTROL_POINT_PATCH",
+          "RawValue": "8",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_2_CONTROL_POINT_PATCH",
+          "RawValue": "9",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_3_CONTROL_POINT_PATCH",
+          "RawValue": "10",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_4_CONTROL_POINT_PATCH",
+          "RawValue": "11",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_5_CONTROL_POINT_PATCH",
+          "RawValue": "12",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_6_CONTROL_POINT_PATCH",
+          "RawValue": "13",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_7_CONTROL_POINT_PATCH",
+          "RawValue": "14",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_8_CONTROL_POINT_PATCH",
+          "RawValue": "15",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_9_CONTROL_POINT_PATCH",
+          "RawValue": "16",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_10_CONTROL_POINT_PATCH",
+          "RawValue": "17",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_11_CONTROL_POINT_PATCH",
+          "RawValue": "18",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_12_CONTROL_POINT_PATCH",
+          "RawValue": "19",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_13_CONTROL_POINT_PATCH",
+          "RawValue": "20",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_14_CONTROL_POINT_PATCH",
+          "RawValue": "21",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_15_CONTROL_POINT_PATCH",
+          "RawValue": "22",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_16_CONTROL_POINT_PATCH",
+          "RawValue": "23",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_17_CONTROL_POINT_PATCH",
+          "RawValue": "24",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_18_CONTROL_POINT_PATCH",
+          "RawValue": "25",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_19_CONTROL_POINT_PATCH",
+          "RawValue": "26",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_20_CONTROL_POINT_PATCH",
+          "RawValue": "28",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_21_CONTROL_POINT_PATCH",
+          "RawValue": "29",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_22_CONTROL_POINT_PATCH",
+          "RawValue": "30",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_23_CONTROL_POINT_PATCH",
+          "RawValue": "31",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_24_CONTROL_POINT_PATCH",
+          "RawValue": "32",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_25_CONTROL_POINT_PATCH",
+          "RawValue": "33",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_26_CONTROL_POINT_PATCH",
+          "RawValue": "34",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_27_CONTROL_POINT_PATCH",
+          "RawValue": "35",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_28_CONTROL_POINT_PATCH",
+          "RawValue": "36",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_29_CONTROL_POINT_PATCH",
+          "RawValue": "37",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_30_CONTROL_POINT_PATCH",
+          "RawValue": "38",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_31_CONTROL_POINT_PATCH",
+          "RawValue": "39",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "PRIMITIVE_32_CONTROL_POINT_PATCH",
+          "RawValue": "40",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_UNDEFINED",
+          "RawValue": "PRIMITIVE_UNDEFINED",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_POINT",
+          "RawValue": "PRIMITIVE_POINT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_LINE",
+          "RawValue": "PRIMITIVE_LINE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TRIANGLE",
+          "RawValue": "PRIMITIVE_TRIANGLE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_LINE_ADJ",
+          "RawValue": "PRIMITIVE_LINE_ADJ",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_PRIMITIVE_TRIANGLE_ADJ",
+          "RawValue": "PRIMITIVE_TRIANGLE_ADJ",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "SRV_DIMENSION",
+      "Fields": [
+        {
+          "Ident": "SRV_DIMENSION_UNKNOWN",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_BUFFER",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_TEXTURE1D",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_TEXTURE1DARRAY",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_TEXTURE2D",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_TEXTURE2DARRAY",
+          "RawValue": "5",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_TEXTURE2DMS",
+          "RawValue": "6",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_TEXTURE2DMSARRAY",
+          "RawValue": "7",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_TEXTURE3D",
+          "RawValue": "8",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_TEXTURECUBE",
+          "RawValue": "9",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_TEXTURECUBEARRAY",
+          "RawValue": "10",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SRV_DIMENSION_BUFFEREX",
+          "RawValue": "11",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_UNKNOWN",
+          "RawValue": "SRV_DIMENSION_UNKNOWN",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_BUFFER",
+          "RawValue": "SRV_DIMENSION_BUFFER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_TEXTURE1D",
+          "RawValue": "SRV_DIMENSION_TEXTURE1D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_TEXTURE1DARRAY",
+          "RawValue": "SRV_DIMENSION_TEXTURE1DARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_TEXTURE2D",
+          "RawValue": "SRV_DIMENSION_TEXTURE2D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_TEXTURE2DARRAY",
+          "RawValue": "SRV_DIMENSION_TEXTURE2DARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_TEXTURE2DMS",
+          "RawValue": "SRV_DIMENSION_TEXTURE2DMS",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_TEXTURE2DMSARRAY",
+          "RawValue": "SRV_DIMENSION_TEXTURE2DMSARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_TEXTURE3D",
+          "RawValue": "SRV_DIMENSION_TEXTURE3D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SRV_DIMENSION_TEXTURECUBE",
+          "RawValue": "SRV_DIMENSION_TEXTURECUBE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_UNKNOWN",
+          "RawValue": "SRV_DIMENSION_UNKNOWN",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_BUFFER",
+          "RawValue": "SRV_DIMENSION_BUFFER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_TEXTURE1D",
+          "RawValue": "SRV_DIMENSION_TEXTURE1D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_TEXTURE1DARRAY",
+          "RawValue": "SRV_DIMENSION_TEXTURE1DARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_TEXTURE2D",
+          "RawValue": "SRV_DIMENSION_TEXTURE2D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_TEXTURE2DARRAY",
+          "RawValue": "SRV_DIMENSION_TEXTURE2DARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_TEXTURE2DMS",
+          "RawValue": "SRV_DIMENSION_TEXTURE2DMS",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_TEXTURE2DMSARRAY",
+          "RawValue": "SRV_DIMENSION_TEXTURE2DMSARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_TEXTURE3D",
+          "RawValue": "SRV_DIMENSION_TEXTURE3D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_TEXTURECUBE",
+          "RawValue": "SRV_DIMENSION_TEXTURECUBE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_1_SRV_DIMENSION_TEXTURECUBEARRAY",
+          "RawValue": "SRV_DIMENSION_TEXTURECUBEARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "INCLUDE_TYPE",
+      "Fields": [
+        {
+          "Ident": "INCLUDE_LOCAL",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "INCLUDE_SYSTEM",
+          "RawValue": "(INCLUDE_LOCAL+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_INCLUDE_LOCAL",
+          "RawValue": "INCLUDE_LOCAL",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_INCLUDE_SYSTEM",
+          "RawValue": "INCLUDE_SYSTEM",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "INCLUDE_FORCE_DWORD",
+          "RawValue": "0x7fffffff",
+          "UInt32Value": 2147483647,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "SHADER_VARIABLE_CLASS",
+      "Fields": [
+        {
+          "Ident": "SVC_SCALAR",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVC_VECTOR",
+          "RawValue": "(SVC_SCALAR+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVC_MATRIX_ROWS",
+          "RawValue": "(SVC_VECTOR+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVC_MATRIX_COLUMNS",
+          "RawValue": "(SVC_MATRIX_ROWS+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVC_OBJECT",
+          "RawValue": "(SVC_MATRIX_COLUMNS+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVC_STRUCT",
+          "RawValue": "(SVC_OBJECT+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVC_INTERFACE_CLASS",
+          "RawValue": "(SVC_STRUCT+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVC_INTERFACE_POINTER",
+          "RawValue": "(SVC_INTERFACE_CLASS+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVC_SCALAR",
+          "RawValue": "SVC_SCALAR",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVC_VECTOR",
+          "RawValue": "SVC_VECTOR",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVC_MATRIX_ROWS",
+          "RawValue": "SVC_MATRIX_ROWS",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVC_MATRIX_COLUMNS",
+          "RawValue": "SVC_MATRIX_COLUMNS",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVC_OBJECT",
+          "RawValue": "SVC_OBJECT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVC_STRUCT",
+          "RawValue": "SVC_STRUCT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVC_FORCE_DWORD",
+          "RawValue": "0x7fffffff",
+          "UInt32Value": 2147483647,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "SHADER_VARIABLE_FLAGS",
+      "Fields": [
+        {
+          "Ident": "SVF_USERPACKED",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVF_USED",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVF_INTERFACE_POINTER",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVF_INTERFACE_PARAMETER",
+          "RawValue": "8",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVF_USERPACKED",
+          "RawValue": "SVF_USERPACKED",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVF_USED",
+          "RawValue": "SVF_USED",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVF_FORCE_DWORD",
+          "RawValue": "0x7fffffff",
+          "UInt32Value": 2147483647,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "SHADER_VARIABLE_TYPE",
+      "Fields": [
+        {
+          "Ident": "SVT_VOID",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_BOOL",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_INT",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_FLOAT",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_STRING",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURE",
+          "RawValue": "5",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURE1D",
+          "RawValue": "6",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURE2D",
+          "RawValue": "7",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURE3D",
+          "RawValue": "8",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURECUBE",
+          "RawValue": "9",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_SAMPLER",
+          "RawValue": "10",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_SAMPLER1D",
+          "RawValue": "11",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_SAMPLER2D",
+          "RawValue": "12",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_SAMPLER3D",
+          "RawValue": "13",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_SAMPLERCUBE",
+          "RawValue": "14",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_PIXELSHADER",
+          "RawValue": "15",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_VERTEXSHADER",
+          "RawValue": "16",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_PIXELFRAGMENT",
+          "RawValue": "17",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_VERTEXFRAGMENT",
+          "RawValue": "18",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_UINT",
+          "RawValue": "19",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_UINT8",
+          "RawValue": "20",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_GEOMETRYSHADER",
+          "RawValue": "21",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RASTERIZER",
+          "RawValue": "22",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_DEPTHSTENCIL",
+          "RawValue": "23",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_BLEND",
+          "RawValue": "24",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_BUFFER",
+          "RawValue": "25",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_CBUFFER",
+          "RawValue": "26",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TBUFFER",
+          "RawValue": "27",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURE1DARRAY",
+          "RawValue": "28",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURE2DARRAY",
+          "RawValue": "29",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RENDERTARGETVIEW",
+          "RawValue": "30",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_DEPTHSTENCILVIEW",
+          "RawValue": "31",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURE2DMS",
+          "RawValue": "32",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURE2DMSARRAY",
+          "RawValue": "33",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_TEXTURECUBEARRAY",
+          "RawValue": "34",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_HULLSHADER",
+          "RawValue": "35",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_DOMAINSHADER",
+          "RawValue": "36",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_INTERFACE_POINTER",
+          "RawValue": "37",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_COMPUTESHADER",
+          "RawValue": "38",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_DOUBLE",
+          "RawValue": "39",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RWTEXTURE1D",
+          "RawValue": "40",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RWTEXTURE1DARRAY",
+          "RawValue": "41",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RWTEXTURE2D",
+          "RawValue": "42",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RWTEXTURE2DARRAY",
+          "RawValue": "43",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RWTEXTURE3D",
+          "RawValue": "44",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RWBUFFER",
+          "RawValue": "45",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_BYTEADDRESS_BUFFER",
+          "RawValue": "46",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RWBYTEADDRESS_BUFFER",
+          "RawValue": "47",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_STRUCTURED_BUFFER",
+          "RawValue": "48",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_RWSTRUCTURED_BUFFER",
+          "RawValue": "49",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_APPEND_STRUCTURED_BUFFER",
+          "RawValue": "50",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_CONSUME_STRUCTURED_BUFFER",
+          "RawValue": "51",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_VOID",
+          "RawValue": "SVT_VOID",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_BOOL",
+          "RawValue": "SVT_BOOL",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_INT",
+          "RawValue": "SVT_INT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_FLOAT",
+          "RawValue": "SVT_FLOAT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_STRING",
+          "RawValue": "SVT_STRING",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURE",
+          "RawValue": "SVT_TEXTURE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURE1D",
+          "RawValue": "SVT_TEXTURE1D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURE2D",
+          "RawValue": "SVT_TEXTURE2D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURE3D",
+          "RawValue": "SVT_TEXTURE3D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURECUBE",
+          "RawValue": "SVT_TEXTURECUBE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_SAMPLER",
+          "RawValue": "SVT_SAMPLER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_SAMPLER1D",
+          "RawValue": "SVT_SAMPLER1D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_SAMPLER2D",
+          "RawValue": "SVT_SAMPLER2D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_SAMPLER3D",
+          "RawValue": "SVT_SAMPLER3D",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_SAMPLERCUBE",
+          "RawValue": "SVT_SAMPLERCUBE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_PIXELSHADER",
+          "RawValue": "SVT_PIXELSHADER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_VERTEXSHADER",
+          "RawValue": "SVT_VERTEXSHADER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_PIXELFRAGMENT",
+          "RawValue": "SVT_PIXELFRAGMENT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_VERTEXFRAGMENT",
+          "RawValue": "SVT_VERTEXFRAGMENT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_UINT",
+          "RawValue": "SVT_UINT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_UINT8",
+          "RawValue": "SVT_UINT8",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_GEOMETRYSHADER",
+          "RawValue": "SVT_GEOMETRYSHADER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_RASTERIZER",
+          "RawValue": "SVT_RASTERIZER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_DEPTHSTENCIL",
+          "RawValue": "SVT_DEPTHSTENCIL",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_BLEND",
+          "RawValue": "SVT_BLEND",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_BUFFER",
+          "RawValue": "SVT_BUFFER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_CBUFFER",
+          "RawValue": "SVT_CBUFFER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TBUFFER",
+          "RawValue": "SVT_TBUFFER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURE1DARRAY",
+          "RawValue": "SVT_TEXTURE1DARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURE2DARRAY",
+          "RawValue": "SVT_TEXTURE2DARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_RENDERTARGETVIEW",
+          "RawValue": "SVT_RENDERTARGETVIEW",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_DEPTHSTENCILVIEW",
+          "RawValue": "SVT_DEPTHSTENCILVIEW",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURE2DMS",
+          "RawValue": "SVT_TEXTURE2DMS",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURE2DMSARRAY",
+          "RawValue": "SVT_TEXTURE2DMSARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SVT_TEXTURECUBEARRAY",
+          "RawValue": "SVT_TEXTURECUBEARRAY",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SVT_FORCE_DWORD",
+          "RawValue": "0x7fffffff",
+          "UInt32Value": 2147483647,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "SHADER_INPUT_FLAGS",
+      "Fields": [
+        {
+          "Ident": "SIF_USERPACKED",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIF_COMPARISON_SAMPLER",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIF_TEXTURE_COMPONENT_0",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIF_TEXTURE_COMPONENT_1",
+          "RawValue": "8",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIF_TEXTURE_COMPONENTS",
+          "RawValue": "12",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SIF_USERPACKED",
+          "RawValue": "SIF_USERPACKED",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SIF_COMPARISON_SAMPLER",
+          "RawValue": "SIF_COMPARISON_SAMPLER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SIF_TEXTURE_COMPONENT_0",
+          "RawValue": "SIF_TEXTURE_COMPONENT_0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SIF_TEXTURE_COMPONENT_1",
+          "RawValue": "SIF_TEXTURE_COMPONENT_1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SIF_TEXTURE_COMPONENTS",
+          "RawValue": "SIF_TEXTURE_COMPONENTS",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIF_FORCE_DWORD",
+          "RawValue": "0x7fffffff",
+          "UInt32Value": 2147483647,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "SHADER_INPUT_TYPE",
+      "Fields": [
+        {
+          "Ident": "SIT_CBUFFER",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_TBUFFER",
+          "RawValue": "(SIT_CBUFFER+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_TEXTURE",
+          "RawValue": "(SIT_TBUFFER+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_SAMPLER",
+          "RawValue": "(SIT_TEXTURE+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_UAV_RWTYPED",
+          "RawValue": "(SIT_SAMPLER+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_STRUCTURED",
+          "RawValue": "(SIT_UAV_RWTYPED+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_UAV_RWSTRUCTURED",
+          "RawValue": "(SIT_STRUCTURED+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_BYTEADDRESS",
+          "RawValue": "(SIT_UAV_RWSTRUCTURED+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_UAV_RWBYTEADDRESS",
+          "RawValue": "(SIT_BYTEADDRESS+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_UAV_APPEND_STRUCTURED",
+          "RawValue": "(SIT_UAV_RWBYTEADDRESS+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_UAV_CONSUME_STRUCTURED",
+          "RawValue": "(SIT_UAV_APPEND_STRUCTURED+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "SIT_UAV_RWSTRUCTURED_WITH_COUNTER",
+          "RawValue": "(SIT_UAV_CONSUME_STRUCTURED+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SIT_CBUFFER",
+          "RawValue": "SIT_CBUFFER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SIT_TBUFFER",
+          "RawValue": "SIT_TBUFFER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SIT_TEXTURE",
+          "RawValue": "SIT_TEXTURE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_SIT_SAMPLER",
+          "RawValue": "SIT_SAMPLER",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "SHADER_CBUFFER_FLAGS",
+      "Fields": [
+        {
+          "Ident": "CBF_USERPACKED",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_CBF_USERPACKED",
+          "RawValue": "CBF_USERPACKED",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "CBF_FORCE_DWORD",
+          "RawValue": "0x7fffffff",
+          "UInt32Value": 2147483647,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "CBUFFER_TYPE",
+      "Fields": [
+        {
+          "Ident": "CT_CBUFFER",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "CT_TBUFFER",
+          "RawValue": "(CT_CBUFFER+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "CT_INTERFACE_POINTERS",
+          "RawValue": "(CT_TBUFFER+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "CT_RESOURCE_BIND_INFO",
+          "RawValue": "(CT_INTERFACE_POINTERS+1)",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_CT_CBUFFER",
+          "RawValue": "CT_CBUFFER",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_CT_TBUFFER",
+          "RawValue": "CT_TBUFFER",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "NAME",
+      "Fields": [
+        {
+          "Ident": "NAME_UNDEFINED",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_POSITION",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_CLIP_DISTANCE",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_CULL_DISTANCE",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_RENDER_TARGET_ARRAY_INDEX",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_VIEWPORT_ARRAY_INDEX",
+          "RawValue": "5",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_VERTEX_ID",
+          "RawValue": "6",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_PRIMITIVE_ID",
+          "RawValue": "7",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_INSTANCE_ID",
+          "RawValue": "8",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_IS_FRONT_FACE",
+          "RawValue": "9",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_SAMPLE_INDEX",
+          "RawValue": "10",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_FINAL_QUAD_EDGE_TESSFACTOR",
+          "RawValue": "11",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_FINAL_QUAD_INSIDE_TESSFACTOR",
+          "RawValue": "12",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_FINAL_TRI_EDGE_TESSFACTOR",
+          "RawValue": "13",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_FINAL_TRI_INSIDE_TESSFACTOR",
+          "RawValue": "14",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_FINAL_LINE_DETAIL_TESSFACTOR",
+          "RawValue": "15",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_FINAL_LINE_DENSITY_TESSFACTOR",
+          "RawValue": "16",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_TARGET",
+          "RawValue": "64",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_DEPTH",
+          "RawValue": "65",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_COVERAGE",
+          "RawValue": "66",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_DEPTH_GREATER_EQUAL",
+          "RawValue": "67",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "NAME_DEPTH_LESS_EQUAL",
+          "RawValue": "68",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_UNDEFINED",
+          "RawValue": "NAME_UNDEFINED",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_POSITION",
+          "RawValue": "NAME_POSITION",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_CLIP_DISTANCE",
+          "RawValue": "NAME_CLIP_DISTANCE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_CULL_DISTANCE",
+          "RawValue": "NAME_CULL_DISTANCE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_RENDER_TARGET_ARRAY_INDEX",
+          "RawValue": "NAME_RENDER_TARGET_ARRAY_INDEX",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_VIEWPORT_ARRAY_INDEX",
+          "RawValue": "NAME_VIEWPORT_ARRAY_INDEX",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_VERTEX_ID",
+          "RawValue": "NAME_VERTEX_ID",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_PRIMITIVE_ID",
+          "RawValue": "NAME_PRIMITIVE_ID",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_INSTANCE_ID",
+          "RawValue": "NAME_INSTANCE_ID",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_IS_FRONT_FACE",
+          "RawValue": "NAME_IS_FRONT_FACE",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_SAMPLE_INDEX",
+          "RawValue": "NAME_SAMPLE_INDEX",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_TARGET",
+          "RawValue": "NAME_TARGET",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_DEPTH",
+          "RawValue": "NAME_DEPTH",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_NAME_COVERAGE",
+          "RawValue": "NAME_COVERAGE",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "RESOURCE_RETURN_TYPE",
+      "Fields": [
+        {
+          "Ident": "RETURN_TYPE_UNORM",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "RETURN_TYPE_SNORM",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "RETURN_TYPE_SINT",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "RETURN_TYPE_UINT",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "RETURN_TYPE_FLOAT",
+          "RawValue": "5",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "RETURN_TYPE_MIXED",
+          "RawValue": "6",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "RETURN_TYPE_DOUBLE",
+          "RawValue": "7",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "RETURN_TYPE_CONTINUED",
+          "RawValue": "8",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_RETURN_TYPE_UNORM",
+          "RawValue": "RETURN_TYPE_UNORM",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_RETURN_TYPE_SNORM",
+          "RawValue": "RETURN_TYPE_SNORM",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_RETURN_TYPE_SINT",
+          "RawValue": "RETURN_TYPE_SINT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_RETURN_TYPE_UINT",
+          "RawValue": "RETURN_TYPE_UINT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_RETURN_TYPE_FLOAT",
+          "RawValue": "RETURN_TYPE_FLOAT",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_RETURN_TYPE_MIXED",
+          "RawValue": "RETURN_TYPE_MIXED",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "REGISTER_COMPONENT_TYPE",
+      "Fields": [
+        {
+          "Ident": "REGISTER_COMPONENT_UNKNOWN",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "REGISTER_COMPONENT_UINT32",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "REGISTER_COMPONENT_SINT32",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "REGISTER_COMPONENT_FLOAT32",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_REGISTER_COMPONENT_UNKNOWN",
+          "RawValue": "REGISTER_COMPONENT_UNKNOWN",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_REGISTER_COMPONENT_UINT32",
+          "RawValue": "REGISTER_COMPONENT_UINT32",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_REGISTER_COMPONENT_SINT32",
+          "RawValue": "REGISTER_COMPONENT_SINT32",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "D3D10_REGISTER_COMPONENT_FLOAT32",
+          "RawValue": "REGISTER_COMPONENT_FLOAT32",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "TESSELLATOR_DOMAIN",
+      "Fields": [
+        {
+          "Ident": "TESSELLATOR_DOMAIN_UNDEFINED",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_DOMAIN_ISOLINE",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_DOMAIN_TRI",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_DOMAIN_QUAD",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "TESSELLATOR_PARTITIONING",
+      "Fields": [
+        {
+          "Ident": "TESSELLATOR_PARTITIONING_UNDEFINED",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_PARTITIONING_INTEGER",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_PARTITIONING_POW2",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_PARTITIONING_FRACTIONAL_ODD",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_PARTITIONING_FRACTIONAL_EVEN",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    },
+    {
+      "Ident": "TESSELLATOR_OUTPUT_PRIMITIVE",
+      "Fields": [
+        {
+          "Ident": "TESSELLATOR_OUTPUT_UNDEFINED",
+          "RawValue": "0",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_OUTPUT_POINT",
+          "RawValue": "1",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_OUTPUT_LINE",
+          "RawValue": "2",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_OUTPUT_TRIANGLE_CW",
+          "RawValue": "3",
+          "UInt32Value": null,
+          "StringValue": null
+        },
+        {
+          "Ident": "TESSELLATOR_OUTPUT_TRIANGLE_CCW",
+          "RawValue": "4",
+          "UInt32Value": null,
+          "StringValue": null
+        }
+      ]
+    }
+  ]
+}

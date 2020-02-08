@@ -1,0 +1,17 @@
+{
+  "Filename": "WINDOWS",
+  "Structs": null,
+  "Functions": null,
+  "TypeAliases": [
+    {
+      "Ident": "HWND",
+      "Alias": "uintptr"
+    },
+    {
+      "Ident": "HMODULE",
+      "Alias": "uintptr"
+    }
+  ],
+  "VtblStructs": null,
+  "Enums": null
+}

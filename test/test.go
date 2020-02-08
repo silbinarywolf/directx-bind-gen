@@ -1,0 +1,157 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+	"runtime"
+	"syscall"
+
+	"github.com/gonutz/w32"
+	d3d11 "github.com/silbinarywolf/directx-bind-gen/dist"
+)
+
+var _ d3d11.DXGI_FORMAT
+
+type messageCallback func(window w32.HWND, msg uint32, w, l uintptr) uintptr
+
+const (
+	windowWidth  = 1280
+	windowHeight = 720
+)
+
+func init() {
+	runtime.LockOSThread()
+}
+
+// Example is a work-in-progress translation of DirectX11 tutorials
+func Example() {
+	var window w32.HWND
+	{
+		var err error
+		window, err = openWindow("class name", handleEvent, 0, 0, windowWidth, windowHeight)
+		if err != nil {
+			panic(err)
+		}
+		w32.SetWindowText(window, "My New Window")
+		w32.ShowCursor(false)
+		w32.ShowWindow(window, 1)
+	}
+	driverTypes := []d3d11.DRIVER_TYPE{
+		d3d11.DRIVER_TYPE_HARDWARE,
+		d3d11.DRIVER_TYPE_WARP,
+		d3d11.DRIVER_TYPE_REFERENCE,
+	}
+	featureLevels := []d3d11.FEATURE_LEVEL{
+		//d3d11.FEATURE_LEVEL_11_1,
+		d3d11.FEATURE_LEVEL_11_0,
+		d3d11.FEATURE_LEVEL_10_1,
+		d3d11.FEATURE_LEVEL_10_0,
+	}
+	var (
+		device           *d3d11.Device
+		featureLevel     d3d11.FEATURE_LEVEL
+		immediateContext *d3d11.DeviceContext
+		err              d3d11.Error
+	)
+	driverType := d3d11.DRIVER_TYPE_NULL
+	for driverTypeIndex, _ := range driverTypes {
+		driverType = driverTypes[driverTypeIndex]
+		device, featureLevel, immediateContext, err = d3d11.CreateDevice(
+			nil,
+			driverType,
+			0,
+			uint32(d3d11.CREATE_DEVICE_DEBUG),
+			featureLevels,
+			d3d11.SDK_VERSION,
+		)
+		if err != nil {
+			if err.Code() != d3d11.E_INVALIDARG {
+				panic(err)
+			}
+			//panic(err)
+		}
+	}
+	if err != nil {
+		panic(err)
+	}
+	//var dxgiFactory *d3d11.IDXGIFactory1
+	{
+		var dxgiDevice *d3d11.IDXGIDevice
+		if err := device.QueryInterface(dxgiDevice.GUID(), &dxgiDevice); err != nil {
+			panic(err)
+		}
+		fmt.Printf(`
+			dxgiDevice: %v
+		`, dxgiDevice)
+	}
+
+	fmt.Printf(`
+		Device: %v
+		featureLevel: %v
+		immediateContext: %v
+		err: %v
+	`, device, featureLevel, immediateContext, err)
+}
+
+func openWindow(
+	className string,
+	callback messageCallback,
+	x, y, width, height int,
+) (w32.HWND, error) {
+	windowProc := syscall.NewCallback(callback)
+
+	class := w32.WNDCLASSEX{
+		WndProc:   windowProc,
+		Cursor:    w32.LoadCursor(0, w32.MakeIntResource(w32.IDC_ARROW)),
+		ClassName: syscall.StringToUTF16Ptr(className),
+	}
+	if w32.RegisterClassEx(&class) == 0 {
+		return 0, errors.New("RegisterClassEx failed")
+	}
+
+	window := w32.CreateWindowEx(
+		0,
+		syscall.StringToUTF16Ptr(className),
+		nil,
+		w32.WS_OVERLAPPEDWINDOW|w32.WS_VISIBLE,
+		x, y, width, height,
+		0, 0, 0, nil,
+	)
+	if window == 0 {
+		return 0, errors.New("CreateWindowEx failed")
+	}
+
+	return window, nil
+}
+
+func handleEvent(window w32.HWND, message uint32, w, l uintptr) uintptr {
+	switch message {
+	case w32.WM_KEYDOWN:
+		if !isKeyRepeat(l) {
+			switch w {
+			}
+		}
+		return 1
+	case w32.WM_KEYUP:
+		if !isKeyRepeat(l) {
+			switch w {
+			}
+		}
+		return 1
+	case w32.WM_SIZE:
+		return 1
+	case w32.WM_DESTROY:
+		w32.PostQuitMessage(0)
+		return 1
+	default:
+		return w32.DefWindowProc(window, message, w, l)
+	}
+}
+
+func isKeyRepeat(l uintptr) bool {
+	return l&(1<<30) != 0
+}
+
+func main() {
+	Example()
+}
