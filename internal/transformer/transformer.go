@@ -95,7 +95,10 @@ func transformParameters(parameters []types.StructField) []types.StructField {
 			param.TypeInfo.GoType = transformIdent(typetrans.GoTypeFromTypeInfo(param.TypeInfo))
 		}
 		firstPrevHasECount = param.HasECount
-		if typeInfo, ok := param.TypeInfo.Type.(*types.FunctionPointer); ok {
+		switch typeInfo := param.TypeInfo.Type.(type) {
+		case *types.Pointer:
+			param.IsDeref = param.TypeInfo.Ident == "void" && typeInfo.Depth == 2
+		case *types.FunctionPointer:
 			typeInfo.Ident = transformIdent(param.Name)
 			typeInfo.Parameters = transformParameters(typeInfo.Parameters)
 		}

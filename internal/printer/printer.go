@@ -63,7 +63,7 @@ var (
 	d3d11 = syscall.NewLazyDLL("d3d11.dll")
 )
 
-`, interfaceWithGuid, typetrans.GUIDTypeTranslation().GoType))
+`))
 	for _, file := range project.Files {
 		if len(file.Macros) > 0 {
 			for _, record := range file.Macros {
@@ -88,6 +88,7 @@ var (
 			b.WriteString("func " + ident)
 			printParametersAndReturns(&b, record.Parameters)
 			b.WriteString(" {\n")
+			printParameterInitVars(&b, record.Parameters)
 			b.WriteString("\tret, _, _ := ")
 			b.WriteString(callIdent)
 			b.WriteString(".Call(\n")
@@ -173,29 +174,7 @@ var (
 					b.WriteString("func (obj *" + structIdent + ") " + methodName)
 					printParametersAndReturns(&b, parameters)
 					b.WriteString(" {\n")
-					// Write init vars
-					for _, param := range parameters {
-						if param.IsDeref {
-							refName := param.Name + "Ref"
-							pointerName := param.Name + "Pointer"
-
-							b.WriteString("\t")
-							b.WriteString(refName)
-							b.WriteString(" := ")
-							b.WriteString("reflect.ValueOf(")
-							b.WriteString(param.Name)
-							b.WriteString(")\n")
-							b.WriteString("\tif " + refName + ".Kind() != reflect.Ptr {\n")
-							b.WriteString("\t\tpanic(\"Expected a pointer\")\n")
-							b.WriteString("\t}\n")
-							b.WriteString("\t")
-							b.WriteString(pointerName)
-							b.WriteString(" := ")
-							b.WriteString(refName)
-							b.WriteString(".Pointer()\n")
-							b.WriteString("\n")
-						}
-					}
+					printParameterInitVars(&b, parameters)
 					// Write method body
 					b.WriteString("\t")
 					unusedParameterCount := 0
@@ -334,8 +313,9 @@ func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) 
 			if goType == "" {
 				panic("Expecting TypeInfo.GoType string to have value for Name: " + param.Name)
 			}
+			isDeref := param.IsDeref
 			if param.IsOut &&
-				!param.IsDeref {
+				!isDeref {
 				continue
 			}
 			if i != 0 {
@@ -418,6 +398,32 @@ func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) 
 	}
 	return i
 }*/
+
+func printParameterInitVars(b *bytes.Buffer, parameters []types.StructField) {
+	// Write init vars
+	for _, param := range parameters {
+		if param.IsDeref {
+			refName := param.Name + "Ref"
+			pointerName := param.Name + "Pointer"
+
+			b.WriteString("\t")
+			b.WriteString(refName)
+			b.WriteString(" := ")
+			b.WriteString("reflect.ValueOf(")
+			b.WriteString(param.Name)
+			b.WriteString(")\n")
+			b.WriteString("\tif " + refName + ".Kind() != reflect.Ptr {\n")
+			b.WriteString("\t\tpanic(\"Expected a pointer\")\n")
+			b.WriteString("\t}\n")
+			b.WriteString("\t")
+			b.WriteString(pointerName)
+			b.WriteString(" := ")
+			b.WriteString(refName)
+			b.WriteString(".Pointer()\n")
+			b.WriteString("\n")
+		}
+	}
+}
 
 func printStructFields(b *bytes.Buffer, fields []types.StructField) {
 	if len(fields) == 0 {
