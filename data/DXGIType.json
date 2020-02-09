@@ -307,27 +307,27 @@
       "Fields": [
         {
           "Ident": "DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED",
-          "RawValue": "0",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "0"
         },
         {
           "Ident": "DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE",
-          "RawValue": "1",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "1"
         },
         {
           "Ident": "DXGI_MODE_SCANLINE_ORDER_UPPER_FIELD_FIRST",
-          "RawValue": "2",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "2"
         },
         {
           "Ident": "DXGI_MODE_SCANLINE_ORDER_LOWER_FIELD_FIRST",
-          "RawValue": "3",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "3"
         }
       ]
     },
@@ -336,21 +336,21 @@
       "Fields": [
         {
           "Ident": "DXGI_MODE_SCALING_UNSPECIFIED",
-          "RawValue": "0",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "0"
         },
         {
           "Ident": "DXGI_MODE_SCALING_CENTERED",
-          "RawValue": "1",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "1"
         },
         {
           "Ident": "DXGI_MODE_SCALING_STRETCHED",
-          "RawValue": "2",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "2"
         }
       ]
     },
@@ -359,35 +359,36 @@
       "Fields": [
         {
           "Ident": "DXGI_MODE_ROTATION_UNSPECIFIED",
-          "RawValue": "0",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "0"
         },
         {
           "Ident": "DXGI_MODE_ROTATION_IDENTITY",
-          "RawValue": "1",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "1"
         },
         {
           "Ident": "DXGI_MODE_ROTATION_ROTATE90",
-          "RawValue": "2",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "2"
         },
         {
           "Ident": "DXGI_MODE_ROTATION_ROTATE180",
-          "RawValue": "3",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "3"
         },
         {
           "Ident": "DXGI_MODE_ROTATION_ROTATE270",
-          "RawValue": "4",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "4"
         }
       ]
     }
-  ]
+  ],
+  "Macros": null
 }

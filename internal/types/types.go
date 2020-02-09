@@ -1,16 +1,30 @@
 package types
 
+import "strconv"
+
 type Project struct {
 	Files []File
 }
 
 type Value struct {
-	// RawValue is the value as it appears in C-code
-	RawValue string
 	// UInt32Value is set if the value is an uint32 type
 	UInt32Value *uint32
 	// StringValue is set if the value is a string type
 	StringValue *string
+	// RawValue is the value as it appears in C-code, this is
+	// used in code generation if we can't compute the value
+	RawValue string
+}
+
+// String will get the value that
+func (v *Value) String() string {
+	if v.UInt32Value != nil {
+		return strconv.FormatUint(uint64(*v.UInt32Value), 10)
+	}
+	if v.StringValue != nil {
+		return *v.StringValue
+	}
+	return v.RawValue
 }
 
 type File struct {
@@ -20,6 +34,12 @@ type File struct {
 	TypeAliases []TypeAlias
 	VtblStructs []Struct
 	Enums       []Enum
+	Macros      []Macro
+}
+
+type Macro struct {
+	Ident string
+	Value
 }
 
 type Function struct {
@@ -66,8 +86,11 @@ type EnumField struct {
 }
 
 type TypeInfo struct {
-	Name  string
-	Type  Type
+	// Name is the name of the type.  "Basic", "Pointer"
+	Name string
+	// Type is the type information
+	Type Type
+	// Ident is the type parsed from .h file
 	Ident string
 	// GoType is generated based on type
 	GoType string
@@ -82,10 +105,11 @@ type BasicType struct {
 
 func (*BasicType) isType() {}
 
-func NewBasicType(data BasicType) TypeInfo {
+func NewBasicType(ident string, data BasicType) TypeInfo {
 	return TypeInfo{
-		Name: "Basic",
-		Type: &data,
+		Name:  "Basic",
+		Ident: ident,
+		Type:  &data,
 	}
 }
 
@@ -95,10 +119,11 @@ type Array struct {
 
 func (*Array) isType() {}
 
-func NewArray(data Array) TypeInfo {
+func NewArray(ident string, data Array) TypeInfo {
 	return TypeInfo{
-		Name: "Array",
-		Type: &data,
+		Name:  "Array",
+		Ident: ident,
+		Type:  &data,
 	}
 }
 
@@ -136,9 +161,10 @@ type Pointer struct {
 
 func (*Pointer) isType() {}
 
-func NewPointer(data Pointer) TypeInfo {
+func NewPointer(ident string, data Pointer) TypeInfo {
 	return TypeInfo{
-		Name: "Pointer",
-		Type: &data,
+		Name:  "Pointer",
+		Ident: ident,
+		Type:  &data,
 	}
 }

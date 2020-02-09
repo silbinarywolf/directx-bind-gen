@@ -1,0 +1,138 @@
+{
+  "Filename": "directx-bind-gen",
+  "Structs": [
+    {
+      "Ident": "GUID",
+      "Fields": [
+        {
+          "TypeInfo": {
+            "Name": "Basic",
+            "Type": {},
+            "Ident": "uint32",
+            "GoType": "uint32"
+          },
+          "Name": "Data1",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "Basic",
+            "Type": {},
+            "Ident": "uint16",
+            "GoType": "uint16"
+          },
+          "Name": "Data2",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "Basic",
+            "Type": {},
+            "Ident": "uint16",
+            "GoType": "uint16"
+          },
+          "Name": "Data3",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "Array",
+            "Type": {
+              "Dimens": [
+                8
+              ]
+            },
+            "Ident": "byte",
+            "GoType": "[8]byte"
+          },
+          "Name": "Data4",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        }
+      ],
+      "NonVtblIdent": ""
+    },
+    {
+      "Ident": "Rect",
+      "Fields": [
+        {
+          "TypeInfo": {
+            "Name": "Basic",
+            "Type": {},
+            "Ident": "int32",
+            "GoType": "int32"
+          },
+          "Name": "Left",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "Basic",
+            "Type": {},
+            "Ident": "int32",
+            "GoType": "int32"
+          },
+          "Name": "Top",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "Basic",
+            "Type": {},
+            "Ident": "int32",
+            "GoType": "int32"
+          },
+          "Name": "Right",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        },
+        {
+          "TypeInfo": {
+            "Name": "Basic",
+            "Type": {},
+            "Ident": "int32",
+            "GoType": "int32"
+          },
+          "Name": "Bottom",
+          "IsOut": false,
+          "HasECount": false,
+          "IsArrayLen": false
+        }
+      ],
+      "NonVtblIdent": ""
+    }
+  ],
+  "Functions": null,
+  "TypeAliases": [
+    {
+      "Ident": "HWND",
+      "Alias": "uintptr"
+    },
+    {
+      "Ident": "HMODULE",
+      "Alias": "uintptr"
+    }
+  ],
+  "VtblStructs": null,
+  "Enums": null,
+  "Macros": [
+    {
+      "Ident": "E_INVALIDARG",
+      "UInt32Value": null,
+      "StringValue": null,
+      "RawValue": "-2147024809"
+    }
+  ]
+}

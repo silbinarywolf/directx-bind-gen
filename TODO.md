@@ -38,3 +38,4 @@ if err := device.QueryInterface(dxgiDevice.GUID(), &dxgiDevice); err != nil {
 -- ie. needed for setting: `typedef UINT DXGI_USAGE;`
 - Parse UUID from .h files
 -- Add UUID to interfaces, stop using mocked uuid
+- Figure out how to support structs with unions in Golang

@@ -487,8 +487,7 @@ FieldLoop:
 		switch tok := s.TokenText(); tok {
 		case endOfFieldToken, endOfListToken:
 			// Simple type
-			typeInfo = types.NewBasicType(types.BasicType{})
-			typeInfo.Ident = kind
+			typeInfo = types.NewBasicType(kind, types.BasicType{})
 			if builtInTypeTrans, ok := typetrans.BuiltInTypeTranslation(kind); ok {
 				if builtInTypeTrans.Size == "ptr" {
 					typeInfo.Name = builtInTypeTrans.GoType[1:]
@@ -526,20 +525,18 @@ FieldLoop:
 					panic(s.String() + ": expected token: " + endOfFieldToken + " after array type: " + kind)
 				}
 			}
-			typeInfo = types.NewArray(types.Array{
+			typeInfo = types.NewArray(kind, types.Array{
 				Dimens: dimens,
 			})
-			typeInfo.Ident = kind
 		default:
 			panic(s.String() + ": expected [ or " + endOfFieldToken + " token, mishandled token:" + name)
 		}
 		if pointerDepth > 0 {
 			// Wrap in pointer type if applicable
-			typeInfo = types.NewPointer(types.Pointer{
+			typeInfo = types.NewPointer(kind, types.Pointer{
 				TypeInfo: typeInfo,
 				Depth:    pointerDepth,
 			})
-			typeInfo.Ident = kind
 		}
 		fields = append(fields, types.StructField{
 			TypeInfo:  typeInfo,

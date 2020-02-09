@@ -9,6 +9,14 @@ import (
 	"github.com/silbinarywolf/directx-bind-gen/internal/types"
 )
 
+func GUIDTypeTranslation() TypeTranslationInfo {
+	return TypeTranslationInfo{
+		// NOTE(Jae): 2020-01-28
+		// Generated in printer.go
+		GoType: "GUID",
+	}
+}
+
 func UIntTypeTranslation() TypeTranslationInfo {
 	return TypeTranslationInfo{
 		GoType: "uint32",
@@ -110,9 +118,8 @@ var builtInTypeTranslation = map[string]TypeTranslationInfo{
 		// with sizeof(BOOL)
 		Size: "4",
 	},
+	"GUID": GUIDTypeTranslation(),
 	"RECT": TypeTranslationInfo{
-		// NOTE(Jae): 2020-01-28
-		// Generated in printer.go
 		GoType: "Rect",
 	},
 	"FLOAT": TypeTranslationInfo{

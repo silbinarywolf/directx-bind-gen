@@ -1036,41 +1036,42 @@
       "Fields": [
         {
           "Ident": "SHVER_PIXEL_SHADER",
-          "RawValue": "0",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "0"
         },
         {
           "Ident": "SHVER_VERTEX_SHADER",
-          "RawValue": "1",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "1"
         },
         {
           "Ident": "SHVER_GEOMETRY_SHADER",
-          "RawValue": "2",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "2"
         },
         {
           "Ident": "SHVER_HULL_SHADER",
-          "RawValue": "3",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "3"
         },
         {
           "Ident": "SHVER_DOMAIN_SHADER",
-          "RawValue": "4",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "4"
         },
         {
           "Ident": "SHVER_COMPUTE_SHADER",
-          "RawValue": "5",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "5"
         }
       ]
     }
-  ]
+  ],
+  "Macros": null
 }

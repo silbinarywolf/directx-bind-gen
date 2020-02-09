@@ -12128,21 +12128,21 @@
       "Fields": [
         {
           "Ident": "DXGI_RESIDENCY_FULLY_RESIDENT",
-          "RawValue": "1",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "1"
         },
         {
           "Ident": "DXGI_RESIDENCY_RESIDENT_IN_SHARED_MEMORY",
-          "RawValue": "2",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "2"
         },
         {
           "Ident": "DXGI_RESIDENCY_EVICTED_TO_DISK",
-          "RawValue": "3",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "3"
         }
       ]
     },
@@ -12151,15 +12151,15 @@
       "Fields": [
         {
           "Ident": "DXGI_SWAP_EFFECT_DISCARD",
-          "RawValue": "0",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "0"
         },
         {
           "Ident": "DXGI_SWAP_EFFECT_SEQUENTIAL",
-          "RawValue": "1",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "1"
         }
       ]
     },
@@ -12168,21 +12168,21 @@
       "Fields": [
         {
           "Ident": "DXGI_SWAP_CHAIN_FLAG_NONPREROTATED",
-          "RawValue": "1",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "1"
         },
         {
           "Ident": "DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH",
-          "RawValue": "2",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "2"
         },
         {
           "Ident": "DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE",
-          "RawValue": "4",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "4"
         }
       ]
     },
@@ -12191,23 +12191,24 @@
       "Fields": [
         {
           "Ident": "DXGI_ADAPTER_FLAG_NONE",
-          "RawValue": "0",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "0"
         },
         {
           "Ident": "DXGI_ADAPTER_FLAG_REMOTE",
-          "RawValue": "1",
           "UInt32Value": null,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "1"
         },
         {
           "Ident": "DXGI_ADAPTER_FLAG_FORCE_DWORD",
-          "RawValue": "0xffffffff",
           "UInt32Value": 4294967295,
-          "StringValue": null
+          "StringValue": null,
+          "RawValue": "0xffffffff"
         }
       ]
     }
-  ]
+  ],
+  "Macros": null
 }

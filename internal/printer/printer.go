@@ -24,26 +24,6 @@ import (
 	"unsafe"
 )
 
-// guid describes a structure used to describe an identifier for a MAPI interface.
-// https://docs.microsoft.com/en-us/office/client-developer/outlook/mapi/iid
-//
-// implemented here too: https://github.com/golang/sys/blob/master/windows/types_windows.go#L1216
-type guid struct {
-	data1 uint32
-	data2 uint16
-	data3 uint16
-	data4 [8]byte
-}
-
-// rect structure defines a rectangle by the coordinates of its upper-left and lower-right corners.
-// https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-rect
-type Rect struct {
-	Left int32
-	Top int32
-	Right int32
-	Bottom int32
-}
-
 type d3dInterface interface {
 	guid() guid
 }
@@ -84,12 +64,24 @@ var (
 	d3d11 = syscall.NewLazyDLL("d3d11.dll")
 )
 
-// E_INVALIDARG indicates that an invalid parameter was passed to the
-// returning function.
-const E_INVALIDARG = -2147024809
-
 `)
 	for _, file := range project.Files {
+		if len(file.Macros) > 0 {
+			for _, record := range file.Macros {
+				ident := record.Ident
+				value := record.Value.String()
+				if ident == value {
+					// ignore referencing self duplicates
+					continue
+				}
+				b.WriteString("const ")
+				b.WriteString(ident)
+				b.WriteString(" = ")
+				b.WriteString(value)
+				b.WriteString("\n")
+			}
+			b.WriteString("\n")
+		}
 		for _, record := range file.Functions {
 			ident := record.Ident
 			callIdent := "call" + record.Ident
@@ -127,11 +119,15 @@ const E_INVALIDARG = -2147024809
 			if structIdent == "" {
 				panic("Unexpected error. Missing ident information for vtbl struct: " + record.Ident)
 			}
-			//
-			b.WriteString("func (obj *" + structIdent + ") guid() guid {\n")
+			// func (obj *Device) GUID() GUID {
+			b.WriteString("func (obj *" + structIdent + ") GUID() ")
+			b.WriteString(typetrans.GUIDTypeTranslation().GoType)
+			b.WriteString(" {\n")
 			// todo(Jae): Get real GUID from header file parsing
 			b.WriteString("\t// this is mocked, todo\n")
-			b.WriteString("\treturn guid{0x2411e7e1, 0x12ac, 0x4ccf, [8]byte{0xbd, 0x14, 0x97, 0x98, 0xe8, 0x53, 0x4d, 0xc0}}\n")
+			b.WriteString("\treturn ")
+			b.WriteString(typetrans.GUIDTypeTranslation().GoType)
+			b.WriteString("{0x2411e7e1, 0x12ac, 0x4ccf, [8]byte{0xbd, 0x14, 0x97, 0x98, 0xe8, 0x53, 0x4d, 0xc0}}\n")
 			b.WriteString("}\n\n")
 			for _, field := range record.Fields {
 				typeInfo, ok := field.TypeInfo.Type.(*types.FunctionPointer)
@@ -223,16 +219,20 @@ const E_INVALIDARG = -2147024809
 				b.WriteString("}\n\n")
 			}
 		}
-		for _, typeAlias := range file.TypeAliases {
-			alias := typeAlias.Alias
-			if builtInTypeTrans, ok := typetrans.BuiltInTypeTranslation(alias); ok {
-				alias = builtInTypeTrans.GoType
+		if len(file.TypeAliases) > 0 {
+			b.WriteString("type (\n")
+			for _, typeAlias := range file.TypeAliases {
+				alias := typeAlias.Alias
+				if builtInTypeTrans, ok := typetrans.BuiltInTypeTranslation(alias); ok {
+					alias = builtInTypeTrans.GoType
+				}
+				ident := typeAlias.Ident
+				if ident == alias {
+					continue
+				}
+				b.WriteString("\t" + ident + " " + alias + "\n")
 			}
-			ident := typeAlias.Ident
-			if ident == alias {
-				continue
-			}
-			b.WriteString("type " + ident + " " + alias + "\n\n")
+			b.WriteString(")\n\n")
 		}
 		for _, record := range file.Enums {
 			ident := record.Ident
@@ -241,14 +241,7 @@ const E_INVALIDARG = -2147024809
 			b.WriteString("const (\n")
 			for _, field := range record.Fields {
 				fieldIdent := field.Ident
-				var value string
-				if field.UInt32Value != nil {
-					value = strconv.FormatUint(uint64(*field.UInt32Value), 10)
-				} else if field.StringValue != nil {
-					value = *field.StringValue
-				} else {
-					value = field.RawValue
-				}
+				value := field.Value.String()
 				if fieldIdent == value {
 					// ignore referencing self duplicates
 					continue
