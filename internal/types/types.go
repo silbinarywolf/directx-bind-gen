@@ -1,6 +1,8 @@
 package types
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type Project struct {
 	Files []File
@@ -32,7 +34,6 @@ type File struct {
 	Structs     []Struct
 	Functions   []Function
 	TypeAliases []TypeAlias
-	VtblStructs []Struct
 	Enums       []Enum
 	Macros      []Macro
 }
@@ -57,8 +58,11 @@ type Struct struct {
 	Ident  string
 	Fields []StructField
 
-	// For Vtbl structs only
-	NonVtblIdent string
+	// Vtbl for the struct
+	VtblStruct *Struct
+
+	// GUID string for the struct (applies only COM interface types)
+	GUID string
 }
 
 type StructField struct {

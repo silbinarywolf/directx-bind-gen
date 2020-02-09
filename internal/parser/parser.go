@@ -20,6 +20,11 @@ func ParseFile(filename string) types.File {
 	}
 	defer f.Close()
 
+	// structIdentToGuid is used to attach GUID/IID data
+	// to a struct
+	structIdentToGuid := make(map[string]string)
+	vtblStructIdentToData := make(map[string]*types.Struct)
+
 	var file types.File
 	file.Filename = filename
 
@@ -83,6 +88,24 @@ func ParseFile(filename string) types.File {
 				// scan until end of line
 				//fmt.Printf("LINE111 tar: %d, actu: %d\n", line, s.Line)
 			}*/
+		case "MIDL_INTERFACE":
+			s.Scan()
+			if tok := s.TokenText(); tok != "(" {
+				panic(s.String() + ": unexpected token: " + tok + " after MIDL_INTERFACE macro")
+			}
+			s.Scan()
+			guid := s.TokenText()
+			if guid[0] != '"' {
+				panic(s.String() + ": unexpected guid value doesn't start with \": " + guid)
+			}
+			guid = guid[1 : len(guid)-1] // trim quotes off either side
+			s.Scan()
+			if tok := s.TokenText(); tok != ")" {
+				panic(s.String() + ": unexpected token: " + tok + " after MIDL_INTERFACE data: " + guid)
+			}
+			s.Scan()
+			structName := s.TokenText()
+			structIdentToGuid[structName] = guid
 		case "typedef":
 			s.Scan()
 			kind := s.TokenText()
@@ -162,14 +185,7 @@ func ParseFile(filename string) types.File {
 					data.Fields = data.Fields[1:]
 				}
 				if isVtbl {
-					// NOTE(Jae): 2020-01-26
-					// A bit of a hack to determine the name. Should probably make
-					// this more robust but we'll see!
-					nonVtblIdent := strings.Replace(data.Ident, "Vtbl", "", 1)
-					if nonVtblIdent != data.Ident {
-						data.NonVtblIdent = nonVtblIdent
-					}
-					file.VtblStructs = append(file.VtblStructs, data)
+					vtblStructIdentToData[data.Ident] = &data
 				} else {
 					file.Structs = append(file.Structs, data)
 				}
@@ -236,6 +252,35 @@ func ParseFile(filename string) types.File {
 			file.Structs = append(file.Structs, data)
 		}
 	}
+
+	// Apply additional data
+	for i := 0; i < len(file.Structs); i++ {
+		record := &file.Structs[i]
+
+		// Apply GUID data to struct (if it exists)
+		if guid, ok := structIdentToGuid[record.Ident]; ok {
+			record.GUID = guid
+		}
+
+		// NOTE(Jae): 2020-01-26
+		// A bit of a hack to determine the name. Should probably make
+		// this more robust but we'll see!
+		determineVtblName := record.Ident + "Vtbl"
+		if vtblStruct, ok := vtblStructIdentToData[determineVtblName]; ok {
+			record.VtblStruct = vtblStruct
+		}
+	}
+	/*for i := 0; i < len(file.VtblStructs); i++ {
+		record := &file.VtblStructs[i]
+		guid, ok := structIdentToGuid[record.Ident]
+		if !ok {
+			fmt.Printf("%v\n", structIdentToGuid)
+			panic(record.Ident)
+			continue
+		}
+		record.GUID = guid
+	}*/
+
 	return file
 }
 

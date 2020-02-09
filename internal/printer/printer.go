@@ -2,6 +2,7 @@ package printer
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 
 	"github.com/silbinarywolf/directx-bind-gen/internal/types"
@@ -16,7 +17,7 @@ func PrintProject(project *types.Project) []byte {
 	// Output
 	var b bytes.Buffer
 	b.WriteString("package d3d11\n\n")
-	b.WriteString(`
+	b.WriteString(fmt.Sprintf(`
 import (
 	"syscall"
 	"strconv"
@@ -25,7 +26,7 @@ import (
 )
 
 type d3dInterface interface {
-	guid() guid
+	GUID() %s
 }
 
 // Error is returned by all Direct3D11 functions. It encapsulates the error code
@@ -64,7 +65,7 @@ var (
 	d3d11 = syscall.NewLazyDLL("d3d11.dll")
 )
 
-`)
+`, typetrans.GUIDTypeTranslation().GoType))
 	for _, file := range project.Files {
 		if len(file.Macros) > 0 {
 			for _, record := range file.Macros {
@@ -102,121 +103,151 @@ var (
 
 		}
 		for _, record := range file.Structs {
-			ident := record.Ident
-			b.WriteString("type " + ident + " struct {\n")
+			structIdent := record.Ident
+
+			b.WriteString("type " + structIdent + " struct {\n")
 			printStructFields(&b, record.Fields)
 			b.WriteString("}\n\n")
-		}
-		for _, record := range file.VtblStructs {
-			{
-				ident := record.Ident
-				b.WriteString("type " + ident + " struct {\n")
+
+			// Add GUID
+			// ie. "839d1216-bb2e-412b-b7f4-a9dbebe08ed1"
+			if len(record.GUID) > 0 {
+				// func (obj *Device) GUID() GUID {
+				b.WriteString("// GUID data type is a text string representing a Class identifier (ID) for COM objects\n")
+				b.WriteString("// ")
+				b.WriteString(record.GUID)
+				b.WriteString("\n")
+				b.WriteString("func (obj *" + structIdent + ") GUID() ")
+				b.WriteString(typetrans.GUIDTypeTranslation().GoType)
+				b.WriteString(" {\n")
+				b.WriteString("\treturn ")
+				b.WriteString(typetrans.GUIDTypeTranslation().GoType)
+				// Print "Data1" field
+				b.WriteString("{0x")
+				b.WriteString(record.GUID[:8])
+				// Print "Data2" field
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[9:13])
+				// Print "Data3" field
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[14:18])
+				// Print "Data4" field
+				b.WriteString(", [8]byte{")
+				b.WriteString("0x")
+				b.WriteString(record.GUID[19:21])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[21:23])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[24:26])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[26:28])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[30:32])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[32:34])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[34:36])
+				b.WriteString("}}\n")
+				//b.WriteString("{0x2411e7e1, 0x12ac, 0x4ccf, [8]byte{0xbd, 0x14, 0x97, 0x98, 0xe8, 0x53, 0x4d, 0xc0}}\n")
+				b.WriteString("}\n\n")
+			}
+
+			// Generate Vtbl
+			if record := record.VtblStruct; record != nil {
+				// Add vtbl struct and fields
+				b.WriteString("type " + record.Ident + " struct {\n")
 				printStructFields(&b, record.Fields)
 				b.WriteString("}\n\n")
-			}
 
-			structIdent := record.NonVtblIdent
-			if structIdent == "" {
-				panic("Unexpected error. Missing ident information for vtbl struct: " + record.Ident)
-			}
-			// func (obj *Device) GUID() GUID {
-			b.WriteString("func (obj *" + structIdent + ") GUID() ")
-			b.WriteString(typetrans.GUIDTypeTranslation().GoType)
-			b.WriteString(" {\n")
-			// todo(Jae): Get real GUID from header file parsing
-			b.WriteString("\t// this is mocked, todo\n")
-			b.WriteString("\treturn ")
-			b.WriteString(typetrans.GUIDTypeTranslation().GoType)
-			b.WriteString("{0x2411e7e1, 0x12ac, 0x4ccf, [8]byte{0xbd, 0x14, 0x97, 0x98, 0xe8, 0x53, 0x4d, 0xc0}}\n")
-			b.WriteString("}\n\n")
-			for _, field := range record.Fields {
-				typeInfo, ok := field.TypeInfo.Type.(*types.FunctionPointer)
-				if !ok {
-					continue
-				}
-				methodName := field.Name
-				parameters := typeInfo.Parameters
-				if parameters[0].Name != "This" {
-					panic("Expected first parameter of function pointer to be This.")
-				}
-				parameterCount := len(parameters)
-				parameters = parameters[1:]
-				b.WriteString("func (obj *" + structIdent + ") " + methodName)
-				printParametersAndReturns(&b, parameters)
-				b.WriteString(" {\n")
-				// Write init vars
-				for _, param := range parameters {
-					if param.TypeInfo.GoType == "REFIID" {
-						// NOTE(Jae): 2020-01-26
-						// After inspecting some of the DirectX11 header files
-						// it seems like REFIID is always the 2nd-last parameter.
-						// So we assume that here.
-						//outParam := parameters[i+1]
-						b.WriteString("\tvar refIIDValue uintptr\n") // := unsafe.Pointer(" + outParam.Name + ")\n")
-						b.WriteString("\t" + param.Name + "Guid" + " := " + param.Name + ".guid()\n")
-						break
+				for _, field := range record.Fields {
+					typeInfo, ok := field.TypeInfo.Type.(*types.FunctionPointer)
+					if !ok {
+						continue
 					}
-				}
-				// Write method body
-				b.WriteString("\t")
-				unusedParameterCount := 0
-				switch parameterCount {
-				case 0, 1, 2, 3:
-					b.WriteString("ret, _, _ := syscall.Syscall(\n")
-					unusedParameterCount = 3
-				case 4, 5, 6:
-					b.WriteString("ret, _, _ := syscall.Syscall6(\n")
-					unusedParameterCount = 6
-				case 7, 8, 9:
-					b.WriteString("ret, _, _ := syscall.Syscall9(\n")
-					unusedParameterCount = 9
-				case 10, 11, 12:
-					b.WriteString("ret, _, _ := syscall.Syscall12(\n")
-					unusedParameterCount = 12
-				default:
-					panic("Unhandled case: Parameter count too big: " + strconv.Itoa(parameterCount))
-				}
-				b.WriteString("\t\tobj.lpVtbl." + methodName + ",\n")
-				b.WriteString("\t\t" + strconv.Itoa(parameterCount) + ",\n")
-				b.WriteString("\t\tuintptr(unsafe.Pointer(obj)),\n")
-				for i, param := range parameters {
-					if param.TypeInfo.GoType == "REFIID" {
-						// NOTE(Jae): 2020-01-26
-						// After inspecting some of the DirectX11 header files
-						// it seems like REFIID is always the 2nd-last parameter.
-						// So we assume that here.
-						if i != len(parameters)-2 {
-							panic("Expected condition. Always expected REFIID to be second last parameter.")
+					methodName := field.Name
+					parameters := typeInfo.Parameters
+					if parameters[0].Name != "This" {
+						panic("Expected first parameter of function pointer to be This.")
+					}
+					parameterCount := len(parameters)
+					parameters = parameters[1:]
+					b.WriteString("func (obj *" + structIdent + ") " + methodName)
+					printParametersAndReturns(&b, parameters)
+					b.WriteString(" {\n")
+					// Write init vars
+					for _, param := range parameters {
+						if param.TypeInfo.GoType == "REFIID" {
+							// NOTE(Jae): 2020-01-26
+							// After inspecting some of the DirectX11 header files
+							// it seems like REFIID is always the 2nd-last parameter.
+							// So we assume that here.
+							//outParam := parameters[i+1]
+							b.WriteString("\tvar refIIDValue uintptr\n") // := unsafe.Pointer(" + outParam.Name + ")\n")
+							b.WriteString("\t" + param.Name + "Guid" + " := " + param.Name + ".guid()\n")
+							break
 						}
-						outParam := parameters[i+1]
-						b.WriteString("\t\tuintptr(unsafe.Pointer(&" + outParam.Name + "Guid)),\n")
-						b.WriteString("\t\tuintptr(unsafe.Pointer(&refIIDValue)),\n")
-						break
 					}
-					printArgument(&b, param)
-				}
-				for i := len(parameters); i < unusedParameterCount-1; i++ {
-					// Handle unused parameters for Syscall, Syscall6, etc
-					b.WriteString("\t\t0,\n")
-				}
-				b.WriteString("\t)\n")
-				b.WriteString("\terr = toErr(ret)\n")
-				b.WriteString("\treturn\n")
-				//panic(fmt.Sprintf("%v\n", parameters))
-				// Release has to be called when finished using the object to free its
-				// associated resources.
-				/*func (obj *ID3D11Texture2D) Release() uint32 {
-					ret, _, _ := syscall.Syscall(
-						obj.vtbl.Release,
-						1,
-						uintptr(unsafe.Pointer(obj)),
-						0,
-						0,
-					)
-					return uint32(ret)
-				}*/
+					// Write method body
+					b.WriteString("\t")
+					unusedParameterCount := 0
+					switch parameterCount {
+					case 0, 1, 2, 3:
+						b.WriteString("ret, _, _ := syscall.Syscall(\n")
+						unusedParameterCount = 3
+					case 4, 5, 6:
+						b.WriteString("ret, _, _ := syscall.Syscall6(\n")
+						unusedParameterCount = 6
+					case 7, 8, 9:
+						b.WriteString("ret, _, _ := syscall.Syscall9(\n")
+						unusedParameterCount = 9
+					case 10, 11, 12:
+						b.WriteString("ret, _, _ := syscall.Syscall12(\n")
+						unusedParameterCount = 12
+					default:
+						panic("Unhandled case: Parameter count too big: " + strconv.Itoa(parameterCount))
+					}
+					b.WriteString("\t\tobj.lpVtbl." + methodName + ",\n")
+					b.WriteString("\t\t" + strconv.Itoa(parameterCount) + ",\n")
+					b.WriteString("\t\tuintptr(unsafe.Pointer(obj)),\n")
+					for i, param := range parameters {
+						if param.TypeInfo.GoType == "REFIID" {
+							// NOTE(Jae): 2020-01-26
+							// After inspecting some of the DirectX11 header files
+							// it seems like REFIID is always the 2nd-last parameter.
+							// So we assume that here.
+							if i != len(parameters)-2 {
+								panic("Expected condition. Always expected REFIID to be second last parameter.")
+							}
+							outParam := parameters[i+1]
+							b.WriteString("\t\tuintptr(unsafe.Pointer(&" + outParam.Name + "Guid)),\n")
+							b.WriteString("\t\tuintptr(unsafe.Pointer(&refIIDValue)),\n")
+							break
+						}
+						printArgument(&b, param)
+					}
+					for i := len(parameters); i < unusedParameterCount-1; i++ {
+						// Handle unused parameters for Syscall, Syscall6, etc
+						b.WriteString("\t\t0,\n")
+					}
+					b.WriteString("\t)\n")
+					b.WriteString("\terr = toErr(ret)\n")
+					b.WriteString("\treturn\n")
+					//panic(fmt.Sprintf("%v\n", parameters))
+					// Release has to be called when finished using the object to free its
+					// associated resources.
+					/*func (obj *ID3D11Texture2D) Release() uint32 {
+						ret, _, _ := syscall.Syscall(
+							obj.vtbl.Release,
+							1,
+							uintptr(unsafe.Pointer(obj)),
+							0,
+							0,
+						)
+						return uint32(ret)
+					}*/
 
-				b.WriteString("}\n\n")
+					b.WriteString("}\n\n")
+				}
 			}
 		}
 		if len(file.TypeAliases) > 0 {

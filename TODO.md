@@ -2,6 +2,8 @@
 
 Personal and vague to-do list so I can keep track on what known-effort is remaining. This will change over time.
 
+- Parse UUID from .h files
+-- Add UUID to interfaces, stop using mocked uuid
 - Add logic to change QueryInterface to follow this format
 ```
 if err := device.QueryInterface(dxgiDevice.GUID(), &dxgiDevice); err != nil {
@@ -36,6 +38,4 @@ if err := device.QueryInterface(dxgiDevice.GUID(), &dxgiDevice); err != nil {
 -- guid REFGUID, pDataSize *uint32, pData uintptr
 - Parse #define flags
 -- ie. needed for setting: `typedef UINT DXGI_USAGE;`
-- Parse UUID from .h files
--- Add UUID to interfaces, stop using mocked uuid
 - Figure out how to support structs with unions in Golang

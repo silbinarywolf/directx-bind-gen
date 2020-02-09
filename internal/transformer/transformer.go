@@ -22,12 +22,10 @@ func Transform(file *types.File) {
 		record := &file.Structs[i]
 		record.Ident = transformIdent(record.Ident)
 		record.Fields = transformParameters(record.Fields)
-	}
-	for i := 0; i < len(file.VtblStructs); i++ {
-		record := &file.VtblStructs[i]
-		record.Ident = transformIdent(record.Ident)
-		record.NonVtblIdent = transformIdent(record.NonVtblIdent)
-		record.Fields = transformParameters(record.Fields)
+		if record := record.VtblStruct; record != nil {
+			record.Ident = transformIdent(record.Ident)
+			record.Fields = transformParameters(record.Fields)
+		}
 	}
 	for i := 0; i < len(file.TypeAliases); i++ {
 		record := &file.TypeAliases[i]
