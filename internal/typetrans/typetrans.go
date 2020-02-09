@@ -14,6 +14,7 @@ func GUIDTypeTranslation() TypeTranslationInfo {
 		// NOTE(Jae): 2020-01-28
 		// Generated in printer.go
 		GoType: "GUID",
+		Size:   "16",
 	}
 }
 
@@ -84,20 +85,9 @@ type TypeTranslationInfo struct {
 // These sizes were measured using sizeof() with Visual Studio 2015 C++.
 // Anything with the size "ptr" is 4 on 32-bit or 8 on 64-bit.
 var builtInTypeTranslation = map[string]TypeTranslationInfo{
-	// vvvvvvvvvvvvvvvvvvvvvvvvvvv
-	// vvvvvvvvvvvvvvvvvvvvvvvvvvv
-	"REFGUID": TypeTranslationInfo{
-		// TODO: Delete this and handle it properly.
-		GoType: "uintptr",
-		Size:   "4",
-	},
-	"REFIID": TypeTranslationInfo{
-		// TODO: Delete this and handle it properly.
-		GoType: "uintptr",
-		Size:   "4",
-	},
-	// ^^^^^^^^^^^^^^^^^^^^^^^^^^
-	// ^^^^^^^^^^^^^^^^^^^^^^^^^^
+	"GUID":    GUIDTypeTranslation(),
+	"REFGUID": GUIDTypeTranslation(),
+	"REFIID":  GUIDTypeTranslation(),
 	"INT": TypeTranslationInfo{
 		GoType: "int32",
 		Size:   "4",
@@ -118,7 +108,6 @@ var builtInTypeTranslation = map[string]TypeTranslationInfo{
 		// with sizeof(BOOL)
 		Size: "4",
 	},
-	"GUID": GUIDTypeTranslation(),
 	"RECT": TypeTranslationInfo{
 		GoType: "Rect",
 	},

@@ -361,9 +361,9 @@ func parseFields(s *scanner.Scanner, endOfFieldToken string, endOfListToken stri
 	var fields []types.StructField
 FieldLoop:
 	for {
-		isOut := false
-		hasECount := false
+		var isOut, isDeref, hasECount bool
 
+		// Scan next field
 		s.Scan()
 		switch v := s.TokenText(); v {
 		case endOfListToken:
@@ -406,6 +406,7 @@ FieldLoop:
 			metaValue := s.TokenText()
 			if strings.HasPrefix(metaValue, "__") {
 				isOut = strings.Contains(metaValue, "_out")
+				isDeref = strings.Contains(metaValue, "_deref")
 				hasECount = strings.Contains(metaValue, "_ecount")
 
 				// Skip meta info like:
@@ -500,6 +501,7 @@ FieldLoop:
 				}),
 				Name:      callType,
 				IsOut:     isOut,
+				IsDeref:   isDeref,
 				HasECount: hasECount,
 			})
 			continue
@@ -587,6 +589,7 @@ FieldLoop:
 			TypeInfo:  typeInfo,
 			Name:      name,
 			IsOut:     isOut,
+			IsDeref:   isDeref,
 			HasECount: hasECount,
 		})
 		if isLastField {

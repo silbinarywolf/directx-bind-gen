@@ -9,7 +9,9 @@ import (
 	"github.com/silbinarywolf/directx-bind-gen/internal/typetrans"
 )
 
-const interfaceWithGuid = "d3dInterface"
+// interfaceWithGuid must be an interface{} as we want the user
+// to pass in a pointer-pointer to methods accepting a GUID/output value
+const interfaceWithGuid = "interface{}"
 
 func PrintProject(project *types.Project) []byte {
 	enumTypeTranslation := typetrans.EnumTypeTranslation()
@@ -21,13 +23,9 @@ func PrintProject(project *types.Project) []byte {
 import (
 	"syscall"
 	"strconv"
-	//"reflect"
+	"reflect"
 	"unsafe"
 )
-
-type d3dInterface interface {
-	GUID() %s
-}
 
 // Error is returned by all Direct3D11 functions. It encapsulates the error code
 // returned by Direct3D. If a function succeeds it will return nil as the Error
@@ -65,7 +63,7 @@ var (
 	d3d11 = syscall.NewLazyDLL("d3d11.dll")
 )
 
-`, typetrans.GUIDTypeTranslation().GoType))
+`, interfaceWithGuid, typetrans.GUIDTypeTranslation().GoType))
 	for _, file := range project.Files {
 		if len(file.Macros) > 0 {
 			for _, record := range file.Macros {
@@ -113,7 +111,7 @@ var (
 			// ie. "839d1216-bb2e-412b-b7f4-a9dbebe08ed1"
 			if len(record.GUID) > 0 {
 				// func (obj *Device) GUID() GUID {
-				b.WriteString("// GUID data type is a text string representing a Class identifier (ID) for COM objects\n")
+				b.WriteString("// GUID returns a string representing a Class identifier (ID) for COM objects\n")
 				b.WriteString("// ")
 				b.WriteString(record.GUID)
 				b.WriteString("\n")
@@ -142,13 +140,14 @@ var (
 				b.WriteString(", 0x")
 				b.WriteString(record.GUID[26:28])
 				b.WriteString(", 0x")
+				b.WriteString(record.GUID[28:30])
+				b.WriteString(", 0x")
 				b.WriteString(record.GUID[30:32])
 				b.WriteString(", 0x")
 				b.WriteString(record.GUID[32:34])
 				b.WriteString(", 0x")
 				b.WriteString(record.GUID[34:36])
 				b.WriteString("}}\n")
-				//b.WriteString("{0x2411e7e1, 0x12ac, 0x4ccf, [8]byte{0xbd, 0x14, 0x97, 0x98, 0xe8, 0x53, 0x4d, 0xc0}}\n")
 				b.WriteString("}\n\n")
 			}
 
@@ -176,15 +175,25 @@ var (
 					b.WriteString(" {\n")
 					// Write init vars
 					for _, param := range parameters {
-						if param.TypeInfo.GoType == "REFIID" {
-							// NOTE(Jae): 2020-01-26
-							// After inspecting some of the DirectX11 header files
-							// it seems like REFIID is always the 2nd-last parameter.
-							// So we assume that here.
-							//outParam := parameters[i+1]
-							b.WriteString("\tvar refIIDValue uintptr\n") // := unsafe.Pointer(" + outParam.Name + ")\n")
-							b.WriteString("\t" + param.Name + "Guid" + " := " + param.Name + ".guid()\n")
-							break
+						if param.IsDeref {
+							refName := param.Name + "Ref"
+							pointerName := param.Name + "Pointer"
+
+							b.WriteString("\t")
+							b.WriteString(refName)
+							b.WriteString(" := ")
+							b.WriteString("reflect.ValueOf(")
+							b.WriteString(param.Name)
+							b.WriteString(")\n")
+							b.WriteString("\tif " + refName + ".Kind() != reflect.Ptr {\n")
+							b.WriteString("\t\tpanic(\"Expected a pointer\")\n")
+							b.WriteString("\t}\n")
+							b.WriteString("\t")
+							b.WriteString(pointerName)
+							b.WriteString(" := ")
+							b.WriteString(refName)
+							b.WriteString(".Pointer()\n")
+							b.WriteString("\n")
 						}
 					}
 					// Write method body
@@ -209,20 +218,7 @@ var (
 					b.WriteString("\t\tobj.lpVtbl." + methodName + ",\n")
 					b.WriteString("\t\t" + strconv.Itoa(parameterCount) + ",\n")
 					b.WriteString("\t\tuintptr(unsafe.Pointer(obj)),\n")
-					for i, param := range parameters {
-						if param.TypeInfo.GoType == "REFIID" {
-							// NOTE(Jae): 2020-01-26
-							// After inspecting some of the DirectX11 header files
-							// it seems like REFIID is always the 2nd-last parameter.
-							// So we assume that here.
-							if i != len(parameters)-2 {
-								panic("Expected condition. Always expected REFIID to be second last parameter.")
-							}
-							outParam := parameters[i+1]
-							b.WriteString("\t\tuintptr(unsafe.Pointer(&" + outParam.Name + "Guid)),\n")
-							b.WriteString("\t\tuintptr(unsafe.Pointer(&refIIDValue)),\n")
-							break
-						}
+					for _, param := range parameters {
 						printArgument(&b, param)
 					}
 					for i := len(parameters); i < unusedParameterCount-1; i++ {
@@ -232,20 +228,6 @@ var (
 					b.WriteString("\t)\n")
 					b.WriteString("\terr = toErr(ret)\n")
 					b.WriteString("\treturn\n")
-					//panic(fmt.Sprintf("%v\n", parameters))
-					// Release has to be called when finished using the object to free its
-					// associated resources.
-					/*func (obj *ID3D11Texture2D) Release() uint32 {
-						ret, _, _ := syscall.Syscall(
-							obj.vtbl.Release,
-							1,
-							uintptr(unsafe.Pointer(obj)),
-							0,
-							0,
-						)
-						return uint32(ret)
-					}*/
-
 					b.WriteString("}\n\n")
 				}
 			}
@@ -299,6 +281,12 @@ func printArgument(b *bytes.Buffer, param types.StructField) {
 		b.WriteString("\t\tuintptr(len(" + name + ")),\n")
 		return
 	}
+	if param.IsDeref {
+		b.WriteString("\t\tuintptr(unsafe.Pointer(" + name)
+		b.WriteString("Pointer")
+		b.WriteString(")),\n")
+		return
+	}
 	switch param.TypeInfo.Type.(type) {
 	case *types.Pointer:
 		if param.HasECount {
@@ -321,12 +309,18 @@ func printArgument(b *bytes.Buffer, param types.StructField) {
 	b.WriteString("\t\t//" + param.Ident + "\n")
 	b.WriteString("\t\tuintptr(" + name + "),\n")*/
 	default:
-		b.WriteString("\t\tuintptr(" + name + "),\n")
+		if param.TypeInfo.GoType == typetrans.GUIDTypeTranslation().GoType {
+			// NOTE(Jae): 2020-02-09
+			// A bit of a hack to make GUID structs work. Might add
+			// "IsStruct" boolean in the future
+			b.WriteString("\t\tuintptr(unsafe.Pointer(&" + name + ")),\n")
+		} else {
+			b.WriteString("\t\tuintptr(" + name + "),\n")
+		}
 	}
 }
 
 func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) {
-	var outParam *types.StructField
 	b.WriteString("(")
 	{
 		i := 0
@@ -340,35 +334,33 @@ func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) 
 			if goType == "" {
 				panic("Expecting TypeInfo.GoType string to have value for Name: " + param.Name)
 			}
-			if goType == "REFIID" {
-				if i != 0 {
-					b.WriteString(", ")
-				}
-				// NOTE(Jae): 2020-01-26
-				// After inspecting some of the DirectX11 header files
-				// it seems like REFIID is always the 2nd-last parameter.
-				// So we assume that here.
-				outParam = &parameters[i+1]
-				b.WriteString(outParam.Name)
+			if param.IsOut &&
+				!param.IsDeref {
+				continue
+			}
+			if i != 0 {
+				b.WriteString(", ")
+			}
+			if param.IsDeref {
+				b.WriteString(param.Name)
 				b.WriteRune(' ')
 				b.WriteString(interfaceWithGuid)
-				break
-			}
-			if !param.IsOut {
-				if i != 0 {
-					b.WriteString(", ")
-				}
+			} else {
 				b.WriteString(param.Name)
 				b.WriteRune(' ')
 				b.WriteString(goType)
-				i++
 			}
+			i++
 		}
 	}
 	b.WriteString(") (")
 	{
 		i := 0
 		for _, param := range parameters {
+			if param.IsDeref {
+				// Skip as we put deref's as input parameters
+				continue
+			}
 			if param.IsArrayLen {
 				// Skip as Go users dont need to pass an array len
 				// they just pass a slice
@@ -392,12 +384,7 @@ func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) 
 			b.WriteString(", ")
 		}
 	}
-	if outParam != nil {
-		b.WriteString("r ")
-		b.WriteString(interfaceWithGuid)
-	} else {
-		b.WriteString("err Error")
-	}
+	b.WriteString("err Error")
 	b.WriteString(")")
 }
 

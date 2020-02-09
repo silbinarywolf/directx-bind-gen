@@ -66,17 +66,21 @@ type Struct struct {
 }
 
 type StructField struct {
-	TypeInfo TypeInfo
-	Name     string
+	Name string
 
-	// IsOut is true when the field has an __out
-	// annotation before it
+	// IsOut is true when the field has an __out annotation
 	IsOut bool
 	// HasECount is true when the field has an __in_ecount_opt
 	// field, this normally means the next field is a UINT
 	// representing how many are in an array
-	HasECount  bool
+	HasECount bool
+	// IsArrayLen is true when field(s) are meant to represent
+	// the length of an array of data.
 	IsArrayLen bool
+	// IsDeref is true when a field has a __deref annotation
+	IsDeref bool
+
+	TypeInfo TypeInfo
 }
 
 type Enum struct {
@@ -159,8 +163,8 @@ func NewFunctionPointer(data FunctionPointer) TypeInfo {
 }
 
 type Pointer struct {
-	TypeInfo TypeInfo
 	Depth    int
+	TypeInfo TypeInfo
 }
 
 func (*Pointer) isType() {}
