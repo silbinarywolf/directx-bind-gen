@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/silbinarywolf/directx-bind-gen/internal/types"
 	"github.com/silbinarywolf/directx-bind-gen/internal/typetrans"
@@ -15,6 +16,7 @@ const interfaceWithGuid = "interface{}"
 
 func PrintProject(project *types.Project) []byte {
 	enumTypeTranslation := typetrans.EnumTypeTranslation()
+	constantAlreadyDefinedMap := make(map[string]bool)
 
 	// Output
 	var b bytes.Buffer
@@ -66,18 +68,34 @@ var (
 `))
 	for _, file := range project.Files {
 		if len(file.Macros) > 0 {
+			hasMacro := false
 			for _, record := range file.Macros {
 				ident := record.Ident
+				if _, ok := constantAlreadyDefinedMap[ident]; ok {
+					continue
+				}
+				if strings.HasSuffix(ident, "_H_VERSION__") {
+					continue
+				}
 				value := record.Value.String()
 				if ident == value {
 					// ignore referencing self duplicates
 					continue
 				}
-				b.WriteString("const ")
+				if !hasMacro {
+					b.WriteString("// Macros\n")
+					b.WriteString("const (\n")
+					hasMacro = true
+				}
+				b.WriteString("\t")
 				b.WriteString(ident)
 				b.WriteString(" = ")
 				b.WriteString(value)
 				b.WriteString("\n")
+				constantAlreadyDefinedMap[ident] = true
+			}
+			if hasMacro {
+				b.WriteString(")\n")
 			}
 			b.WriteString("\n")
 		}

@@ -38,18 +38,15 @@ func ParseFile(filename string) types.File {
 		case "#":
 			s.Scan()
 			switch s.TokenText() {
-			case "define":
-				// todo(Jae): 2020-01-28
-				// Store define constants...
+			case "define", "DEFINE":
+				s.Scan()
+				constIdent := s.TokenText()
 
 				// A few cases to handle:
 				// - #define _INCLUDE_H
 				// - #define D3D_CONST ( 3 )
 				// - #DEFINE DX_VERSION 455
-				// Need to avoid consuming too many tokens ahead or else we accidentally
-				// skip the D3D11_INPUT_ELEMENT_DESC struct
-
-				// Skip until newline for now
+				var exprTokens []string
 				{
 					oldMode := s.Mode
 					oldWhitespace := s.Whitespace
@@ -59,35 +56,70 @@ func ParseFile(filename string) types.File {
 					for {
 						s.Scan()
 						v := s.TokenText()
-						// For debugging
-						// fmt.Printf("%v\n", []byte(v))
+						v = strings.TrimSpace(v)
+						if v == "\\" {
+							continue
+						}
 						if v == "" || v == "\n" {
 							break
 						}
+						exprTokens = append(exprTokens, v)
 					}
 					s.Mode = oldMode
 					s.Whitespace = oldWhitespace
 				}
-				//s.Scan()
-				//macroName := s.TokenText()
-
-				// do nothing with #define so far
-				//fmt.Printf("def: %s %s\n", macroName, tok)
-			}
-			// Read macro until end of line
-			// TODO(Jae): account for the newline backslash thing? ie.
-			/*startLine := s.Line
-			if s.lastLineLen > 0 {
-				startLine++
-			}
-			for tok = s.Scan(); tok != scanner.EOF && line == s.Line; tok = s.Scan() {
-				line := s.Scan
-				if s.lastLineLen > 0 {
-
+				if len(exprTokens) == 0 {
+					continue
 				}
-				// scan until end of line
-				//fmt.Printf("LINE111 tar: %d, actu: %d\n", line, s.Line)
-			}*/
+
+				// Add parsed macro
+				record := types.Macro{
+					Ident: constIdent,
+				}
+				/*for _, exprToken := range exprTokens {
+					record.RawValue += exprToken
+				}*/
+				switch len(exprTokens) {
+				case 0:
+					continue
+				case 1:
+					v := exprTokens[0]
+					if v[0] >= '0' && v[0] <= '9' {
+						record.StringValue = new(string)
+						*record.StringValue = v
+					} else {
+						continue
+					}
+				case 2:
+					if exprTokens[1] == "UL" {
+						// handle 0x00000001UL (parsed as 0x00000001 UL)
+						record.StringValue = new(string)
+						*record.StringValue = exprTokens[0]
+					} else {
+						panic("Unexpected macro parsed. Has only two tokens." + exprTokens[0] + " " + exprTokens[1])
+					}
+				case 3:
+					if exprTokens[0] == "(" &&
+						exprTokens[2] == ")" {
+						v := exprTokens[1]
+						if v[0] >= '0' && v[0] <= '9' {
+							record.StringValue = new(string)
+							*record.StringValue = v
+						} else {
+							continue
+						}
+					}
+				default:
+					continue
+					/*if exprTokens[0] == "(" &&
+						exprTokens[1] == "code" &&
+						exprTokens[2] == ")" {
+						continue
+					}*/
+					//panic(fmt.Sprintf("%v\n", exprTokens))
+				}
+				file.Macros = append(file.Macros, record)
+			}
 		case "MIDL_INTERFACE":
 			s.Scan()
 			if tok := s.TokenText(); tok != "(" {
