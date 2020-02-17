@@ -122,12 +122,18 @@ MainLoop:
 					// #define INTERFACE ID3D10ShaderReflection1
 					continue
 				}
+				if constIdent == "IID_ID3DBlob" {
+					// Ignore cases like:
+					// - #define IID_ID3DBlob IID_ID3D10Blob
+					continue
+				}
 				// A few cases to handle:
 				// - #define _INCLUDE_H
 				// - #define D3D_CONST ( 3 )
 				// - #DEFINE DX_VERSION 455
 				var exprTokens []string
 				{
+					skipThisMacro := false
 					oldMode := s.Mode
 					oldWhitespace := s.Whitespace
 					// https://golang.org/pkg/text/scanner/#example__whitespace
@@ -154,7 +160,8 @@ MainLoop:
 							// - #define __in_range(x, y)
 							if len(exprTokens) == 0 &&
 								prevPos.Offset == nextPos.Offset-1 {
-								continue MainLoop
+								skipThisMacro = true
+								break
 							}
 							// Ignore non-trivial macros like:
 							// - #define MAKE_D3D11_HRESULT( code )  MAKE_HRESULT( 1, _FACD3D11, code )
@@ -162,13 +169,17 @@ MainLoop:
 								IsIdent(exprTokens[len(exprTokens)-1]) &&
 								// ie. 49 == 50-1, for the case MAKE_HRESULT
 								prevPos.Column == nextPos.Column-1 {
-								continue MainLoop
+								skipThisMacro = true
+								break
 							}
 						}
 						exprTokens = append(exprTokens, v)
 					}
 					s.Mode = oldMode
 					s.Whitespace = oldWhitespace
+					if skipThisMacro {
+						continue MainLoop
+					}
 				}
 				if len(exprTokens) == 0 {
 					continue
