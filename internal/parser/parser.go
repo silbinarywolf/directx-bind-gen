@@ -47,7 +47,10 @@ func IsOperator(operator string) bool {
 	c := operator[0]
 	return c == '<' ||
 		c == '+' ||
-		c == '-'
+		c == '-' ||
+		operator == "<<" ||
+		operator == ">>" ||
+		operator == "++"
 }
 
 func IsNumber(str string) bool {
@@ -58,6 +61,23 @@ func IsNumber(str string) bool {
 func IsIdent(str string) bool {
 	c := str[0]
 	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+}
+
+func NumberToFloat64(str string) float64 {
+	if len(str) > 1 &&
+		str[0] == '0' &&
+		str[1] == 'x' {
+		i, err := strconv.ParseInt(str[2:], 16, 0)
+		if err != nil {
+			panic("Failed to parse hex value.")
+		}
+		return float64(i)
+	}
+	i, err := strconv.ParseInt(str, 10, 0)
+	if err != nil {
+		panic(fmt.Sprintf("Tried to parse int and failed: %s", str))
+	}
+	return float64(i)
 }
 
 func ParseFile(filename string) types.File {
@@ -198,6 +218,7 @@ MainLoop:
 							// ( 1UL )
 							// Ignore for now, its to hint that this macro is:
 							// "....an integer constant which has unsigned long int type instead of int."
+							continue
 						case "f":
 							// add f to number, ie. "1.0f"
 							if len(infixNodes) == 0 {
@@ -214,6 +235,7 @@ MainLoop:
 								// Handle <<, ++, etc
 								if len(operatorNodes) > 0 {
 									prevOp := operatorNodes[len(operatorNodes)-1]
+									operatorNodes = operatorNodes[:len(operatorNodes)-1]
 									if t == prevOp {
 										t += prevOp
 									}
@@ -257,14 +279,28 @@ MainLoop:
 						rightValue := stack[len(stack)-1]
 						stack = stack[:len(stack)-1]
 						if len(stack) == 0 {
-							// ie. t = "-", rightValue="42", -42
+							//if t == "<<" {
+							//	panic("Cant prefix a value with: " + t)
+							//}
+							// Operator only, ie. -42
+							// ie. t = "-", rightValue="42"
 							stack = append(stack, t+rightValue)
 							continue
-							// Operator only, ie. -42
-							//panic("todo: operator only: " + t + " for value: " + rightValue)
 						}
 						leftValue := stack[len(stack)-1]
-						panic("TODO: handle operator'ing two values together:\n" + leftValue + " " + t + " " + rightValue + " for #define: " + constIdent)
+						stack = stack[:len(stack)-1]
+						leftValueFloat64 := NumberToFloat64(leftValue)
+						rightValueFloat64 := NumberToFloat64(rightValue)
+						switch t {
+						case "+":
+							result := leftValueFloat64 + rightValueFloat64
+							//fmt.Printf("Result: %v\n", result)
+							stack = append(stack, fmt.Sprintf("%v", result))
+							//panic("TODO: handle operator'ing two values together:\n" + leftValue + " " + t + " " + rightValue + " for #define: " + constIdent)
+							continue
+						default:
+							panic("TODO: handle operator'ing two values together:\n" + leftValue + " " + t + " " + rightValue + " for #define: " + constIdent)
+						}
 						continue
 					}
 					if IsIdent(t) {
@@ -281,7 +317,7 @@ MainLoop:
 					panic("Unexpected error, empty stack from evaluating expression for #define: " + constIdent)
 				}
 				if len(stack) > 1 {
-					panic("Unexpected error, expected stack size of 1, for #define: " + constIdent)
+					panic(fmt.Sprintf("Unexpected error, stack size is %d instead of 1 (%v) for #define: %s", len(stack), stack, constIdent))
 				}
 				result := stack[0]
 
