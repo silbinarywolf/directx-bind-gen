@@ -20,15 +20,19 @@ var precedence = map[string]int{
 	"&&": 2,
 	"==": 3,
 	"!=": 3, // NOTE(Jae): Didn't check this against other langs
-	"+":  4,
-	"-":  4,
-	"/":  4,
-	"*":  4,
-	// NOTE(Jae):
-	// Everything under here is naively copied from:
+	// NOTE(Jae): 2020-02-18
+	// Need << and >> to have a precdence lower than +, -, /, *
+	// otherwise DXGI_USAGE_SHADER_INPUT ends up not being expected 16
+	// (im unsure of if this means the parentheses have the wrong precedence tbh)
+	"<<": 4,
+	">>": 4,
+	"+":  5,
+	"-":  5,
+	"/":  5,
+	"*":  5,
+	// NOTE(Jae): 2020-02-18
+	// Everything under here is naively copied from and untested
 	// https://en.wikipedia.org/wiki/Operators_in_C_and_C%2B%2B
-	"<<": 7,
-	">>": 7,
 	"<":  9,
 	"<=": 9,
 	">":  9,
@@ -202,6 +206,9 @@ MainLoop:
 								break Loop
 							}
 							parenCloseCount++
+							// I actually dont remember why this needs to be here.
+							// But OK. Copy-pasted from old expression evaluation code
+							// on an old compiler project
 							if len(operatorNodes) > 0 {
 								topOperatorNode := operatorNodes[len(operatorNodes)-1]
 								if topOperatorNode == "(" {
@@ -298,6 +305,10 @@ MainLoop:
 							stack = append(stack, fmt.Sprintf("%v", result))
 							//panic("TODO: handle operator'ing two values together:\n" + leftValue + " " + t + " " + rightValue + " for #define: " + constIdent)
 							continue
+						case "<<":
+							result := uint64(leftValueFloat64) << uint64(rightValueFloat64)
+							//fmt.Printf("result: %d for const: %s\n", result, constIdent)
+							stack = append(stack, fmt.Sprintf("%d", result))
 						default:
 							panic("TODO: handle operator'ing two values together:\n" + leftValue + " " + t + " " + rightValue + " for #define: " + constIdent)
 						}
