@@ -235,8 +235,8 @@ MainLoop:
 								// Handle <<, ++, etc
 								if len(operatorNodes) > 0 {
 									prevOp := operatorNodes[len(operatorNodes)-1]
-									operatorNodes = operatorNodes[:len(operatorNodes)-1]
 									if t == prevOp {
+										operatorNodes = operatorNodes[:len(operatorNodes)-1]
 										t += prevOp
 									}
 								}
