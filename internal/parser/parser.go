@@ -13,6 +13,53 @@ import (
 	"github.com/silbinarywolf/directx-bind-gen/internal/typetrans"
 )
 
+var precedence = map[string]int{
+	"(":  1,
+	")":  1,
+	"||": 2,
+	"&&": 2,
+	"==": 3,
+	"!=": 3, // NOTE(Jae): Didn't check this against other langs
+	"+":  4,
+	"-":  4,
+	"/":  4,
+	"*":  4,
+	// NOTE(Jae):
+	// Everything under here is naively copied from:
+	// https://en.wikipedia.org/wiki/Operators_in_C_and_C%2B%2B
+	"<<": 7,
+	">>": 7,
+	"<":  9,
+	"<=": 9,
+	">":  9,
+	">=": 9,
+}
+
+func OperatorPrecedence(operator string) int {
+	r, ok := precedence[operator]
+	if !ok {
+		panic("Invalid operator, no precedence found: " + operator)
+	}
+	return r
+}
+
+func IsOperator(operator string) bool {
+	c := operator[0]
+	return c == '<' ||
+		c == '+' ||
+		c == '-'
+}
+
+func IsNumber(str string) bool {
+	c := str[0]
+	return c >= '0' && c <= '9'
+}
+
+func IsIdent(str string) bool {
+	c := str[0]
+	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+}
+
 func ParseFile(filename string) types.File {
 	f, err := os.Open(filename)
 	if err != nil {
@@ -25,6 +72,9 @@ func ParseFile(filename string) types.File {
 	structIdentToGuid := make(map[string]string)
 	vtblStructIdentToData := make(map[string]*types.Struct)
 
+	//
+	defineValuesMap := make(map[string]string)
+
 	var file types.File
 	file.Filename = filename
 
@@ -32,16 +82,22 @@ func ParseFile(filename string) types.File {
 	s.Init(f)
 	s.Filename = filename
 	s.Mode = scanner.GoTokens //^= scanner.SkipComments // don't skip comments
-	//MainLoop:
+MainLoop:
 	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
 		switch s.TokenText() {
 		case "#":
 			s.Scan()
 			switch s.TokenText() {
 			case "define", "DEFINE":
+				//constIdentPos := s.Pos()
 				s.Scan()
 				constIdent := s.TokenText()
-
+				if constIdent == "INTERFACE" {
+					// Ignore cases like:
+					// #undef INTERFACE
+					// #define INTERFACE ID3D10ShaderReflection1
+					continue
+				}
 				// A few cases to handle:
 				// - #define _INCLUDE_H
 				// - #define D3D_CONST ( 3 )
@@ -50,11 +106,15 @@ func ParseFile(filename string) types.File {
 				{
 					oldMode := s.Mode
 					oldWhitespace := s.Whitespace
-					s.Mode ^= scanner.GoWhitespace
 					// https://golang.org/pkg/text/scanner/#example__whitespace
-					s.Whitespace ^= 1<<'\t' | 1<<'\n' // don't skip tabs and new lines
+					//s.Mode ^= scanner.GoWhitespace
+					//s.Whitespace ^= 1<<'\t' | 1<<'\n' // don't skip tabs and new lines
+					// TODO(Jae): confirm this works
+					s.Whitespace ^= 1 << '\n'
 					for {
+						prevPos := s.Pos()
 						s.Scan()
+						nextPos := s.Pos()
 						v := s.TokenText()
 						v = strings.TrimSpace(v)
 						if v == "\\" {
@@ -62,6 +122,24 @@ func ParseFile(filename string) types.File {
 						}
 						if v == "" || v == "\n" {
 							break
+						}
+						// Handle cases like:
+						// - #define MAKE_D3D11_HRESULT( code )  MAKE_HRESULT( 1, _FACD3D11, code )
+						if v == "(" {
+							// Ignore non-trivial macros like:
+							// - #define __in_range(x, y)
+							if len(exprTokens) == 0 &&
+								prevPos.Offset == nextPos.Offset-1 {
+								continue MainLoop
+							}
+							// Ignore non-trivial macros like:
+							// - #define MAKE_D3D11_HRESULT( code )  MAKE_HRESULT( 1, _FACD3D11, code )
+							if len(exprTokens) > 0 &&
+								IsIdent(exprTokens[len(exprTokens)-1]) &&
+								// ie. 49 == 50-1, for the case MAKE_HRESULT
+								prevPos.Column == nextPos.Column-1 {
+								continue MainLoop
+							}
 						}
 						exprTokens = append(exprTokens, v)
 					}
@@ -72,52 +150,157 @@ func ParseFile(filename string) types.File {
 					continue
 				}
 
+				// Based on a Pratt Expression Parser
+				// - http://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/
+				infixNodes := make([]string, 0, 10)
+				{
+					//hasNumberOrOperator := false
+					parenOpenCount := 0
+					parenCloseCount := 0
+					//expectOperator := false
+					operatorNodes := make([]string, 0, 10)
+				Loop:
+					for len(exprTokens) > 0 {
+						t := exprTokens[0]
+						exprTokens = exprTokens[1:]
+						switch t {
+						//case ",":
+						// Ignore function macros like:
+						// - #define __in_range(x, y)
+						//continue MainLoop
+						case "(":
+							/*if len(infixNodes) > 0 &&
+								IsIdent(infixNodes[len(infixNodes)-1]) {
+								// Ignore "complex" macros like:
+								// - #define MAKE_D3D11_HRESULT( code )  MAKE_HRESULT( 1, _FACD3D11, code )
+								continue MainLoop
+							}*/
+							parenOpenCount++
+						case ")":
+							// If hit end
+							if parenCloseCount == 0 && parenOpenCount == 0 {
+								break Loop
+							}
+							parenCloseCount++
+							if len(operatorNodes) > 0 {
+								topOperatorNode := operatorNodes[len(operatorNodes)-1]
+								if topOperatorNode == "(" {
+									infixNodes = append(infixNodes, topOperatorNode)
+									operatorNodes = operatorNodes[:len(operatorNodes)-1]
+								}
+							}
+						case "L":
+							// ( 1L << (0 + 4) )
+							// Ignore for now, its to hint that this macro is:
+							// "....an integer constant which has long int type instead of int."
+							continue
+						case "UL":
+							// ( 1UL )
+							// Ignore for now, its to hint that this macro is:
+							// "....an integer constant which has unsigned long int type instead of int."
+						case "f":
+							// add f to number, ie. "1.0f"
+							if len(infixNodes) == 0 {
+								panic("Unexpected error. Cannot add f to number for #define: " + constIdent)
+							}
+							// Ignore for now. Its a hint that this type is a float.
+							//infixNodes[len(infixNodes)-1] += "f"
+						default:
+							if IsNumber(t) || IsIdent(t) {
+								infixNodes = append(infixNodes, t)
+								continue
+							}
+							if IsOperator(t) {
+								// Handle <<, ++, etc
+								if len(operatorNodes) > 0 {
+									prevOp := operatorNodes[len(operatorNodes)-1]
+									if t == prevOp {
+										t += prevOp
+									}
+								}
+								// Handle operators
+								for len(operatorNodes) > 0 {
+									topOperatorNode := operatorNodes[len(operatorNodes)-1]
+									if OperatorPrecedence(topOperatorNode) < OperatorPrecedence(t) {
+										break
+									}
+									operatorNodes = operatorNodes[:len(operatorNodes)-1]
+									infixNodes = append(infixNodes, topOperatorNode)
+								}
+								operatorNodes = append(operatorNodes, t)
+								continue
+							}
+							panic("Unhandled expression token: " + t + " for #define: " + constIdent)
+						}
+					}
+
+					for len(operatorNodes) > 0 {
+						topOperatorNode := operatorNodes[len(operatorNodes)-1]
+						operatorNodes = operatorNodes[:len(operatorNodes)-1]
+						infixNodes = append(infixNodes, topOperatorNode)
+					}
+					if parenOpenCount != parenCloseCount {
+						// todo(Jae): better error message
+						panic("Mismatching paren open and close count")
+					}
+				}
+				// Evaluate expression
+				stack := make([]string, 0, 10)
+				for len(infixNodes) > 0 {
+					t := infixNodes[0]
+					infixNodes = infixNodes[1:]
+					if IsNumber(t) {
+						stack = append(stack, t)
+						continue
+					}
+					if IsOperator(t) {
+						rightValue := stack[len(stack)-1]
+						stack = stack[:len(stack)-1]
+						if len(stack) == 0 {
+							// ie. t = "-", rightValue="42", -42
+							stack = append(stack, t+rightValue)
+							continue
+							// Operator only, ie. -42
+							//panic("todo: operator only: " + t + " for value: " + rightValue)
+						}
+						leftValue := stack[len(stack)-1]
+						panic("TODO: handle operator'ing two values together:\n" + leftValue + " " + t + " " + rightValue + " for #define: " + constIdent)
+						continue
+					}
+					if IsIdent(t) {
+						v, ok := defineValuesMap[t]
+						if !ok {
+							panic("Unable to find existing identifier: " + t + " for this #define: " + constIdent)
+						}
+						stack = append(stack, v)
+						continue
+					}
+					panic("Unhandled evaluation token: " + t + " for #define: " + constIdent)
+				}
+				if len(stack) == 0 {
+					panic("Unexpected error, empty stack from evaluating expression for #define: " + constIdent)
+				}
+				if len(stack) > 1 {
+					panic("Unexpected error, expected stack size of 1, for #define: " + constIdent)
+				}
+				result := stack[0]
+
+				defineValuesMap[constIdent] = result
+				// defineValuesMap
+				/*fmt.Printf(`
+					#define: %s
+					infix Nodes: %v
+				`, constIdent, infixNodes)
+				if len(infixNodes) > 1 {
+					panic(fmt.Sprintf("infix: %v\n", infixNodes))
+				}*/
+
 				// Add parsed macro
 				record := types.Macro{
 					Ident: constIdent,
 				}
-				/*for _, exprToken := range exprTokens {
-					record.RawValue += exprToken
-				}*/
-				switch len(exprTokens) {
-				case 0:
-					continue
-				case 1:
-					v := exprTokens[0]
-					if v[0] >= '0' && v[0] <= '9' {
-						record.StringValue = new(string)
-						*record.StringValue = v
-					} else {
-						continue
-					}
-				case 2:
-					if exprTokens[1] == "UL" {
-						// handle 0x00000001UL (parsed as 0x00000001 UL)
-						record.StringValue = new(string)
-						*record.StringValue = exprTokens[0]
-					} else {
-						panic("Unexpected macro parsed. Has only two tokens." + exprTokens[0] + " " + exprTokens[1])
-					}
-				case 3:
-					if exprTokens[0] == "(" &&
-						exprTokens[2] == ")" {
-						v := exprTokens[1]
-						if v[0] >= '0' && v[0] <= '9' {
-							record.StringValue = new(string)
-							*record.StringValue = v
-						} else {
-							continue
-						}
-					}
-				default:
-					continue
-					/*if exprTokens[0] == "(" &&
-						exprTokens[1] == "code" &&
-						exprTokens[2] == ")" {
-						continue
-					}*/
-					//panic(fmt.Sprintf("%v\n", exprTokens))
-				}
+				record.StringValue = new(string)
+				*record.StringValue = result
 				file.Macros = append(file.Macros, record)
 			}
 		case "MIDL_INTERFACE":
