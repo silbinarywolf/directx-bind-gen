@@ -19,11 +19,12 @@ var precedence = map[string]int{
 	"||": 2,
 	"&&": 2,
 	"==": 3,
-	"!=": 3, // NOTE(Jae): Didn't check this against other langs
+	"!=": 3, // NOTE(Jae): 2018(?) - Didn't check this against other langs
 	// NOTE(Jae): 2020-02-18
 	// Need << and >> to have a precdence lower than +, -, /, *
 	// otherwise DXGI_USAGE_SHADER_INPUT ends up not being expected 16
-	// (im unsure of if this means the parentheses have the wrong precedence tbh)
+	// (im unsure of if this means the parentheses are handled incorrectly
+	// but whatever for this use-case for now)
 	"<<": 4,
 	">>": 4,
 	"+":  5,
@@ -543,16 +544,6 @@ MainLoop:
 			record.VtblStruct = vtblStruct
 		}
 	}
-	/*for i := 0; i < len(file.VtblStructs); i++ {
-		record := &file.VtblStructs[i]
-		guid, ok := structIdentToGuid[record.Ident]
-		if !ok {
-			fmt.Printf("%v\n", structIdentToGuid)
-			panic(record.Ident)
-			continue
-		}
-		record.GUID = guid
-	}*/
 
 	return file
 }

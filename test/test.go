@@ -110,7 +110,7 @@ func Example() {
 	`, device, featureLevel, immediateContext, err)
 
 	// DirectX 11.0 systems
-	/*var swapChain *d3d11.IDXGISwapChain
+	var swapChain *d3d11.IDXGISwapChain
 	{
 		sd := d3d11.DXGI_SWAP_CHAIN_DESC{}
 		sd.BufferCount = 1
@@ -123,8 +123,8 @@ func Example() {
 		sd.OutputWindow = d3d11.HWND(window)
 		sd.SampleDesc.Count = 1
 		sd.SampleDesc.Quality = 0
-		sd.Windowed = d3d11.TRUE
-		swapChain, err = dxgiFactory.CreateSwapChain(device, sd)
+		sd.Windowed = 1
+		swapChain, err = dxgiFactory.CreateSwapChain(device, &sd)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -132,7 +132,47 @@ func Example() {
 
 	// Note this tutorial doesn't handle full-screen swapchains so we block the ALT+ENTER shortcut
 	dxgiFactory.MakeWindowAssociation(d3d11.HWND(window), d3d11.DXGI_MWA_NO_ALT_ENTER)
-	dxgiFactory.Release()*/
+	dxgiFactory.Release()
+
+	var backBuffer *d3d11.Texture2D
+	if err := swapChain.GetBuffer(0, backBuffer.GUID(), &backBuffer); err != nil {
+		panic(err.Error())
+	}
+	renderTargetView, err := device.CreateRenderTargetView(backBuffer, nil)
+	backBuffer.Release()
+	if err != nil {
+		panic(err.Error())
+	}
+	immediateContext.OMSetRenderTargets(1, &renderTargetView, nil)
+	viewport := &d3d11.VIEWPORT{
+		Width:    windowWidth,
+		Height:   windowHeight,
+		MinDepth: 0.0,
+		MaxDepth: 0.0,
+		TopLeftX: 0,
+		TopLeftY: 0,
+	}
+	immediateContext.RSSetViewports(1, viewport)
+	fmt.Printf(`
+		renderTargetView: %v
+		viewports: %v
+	`, renderTargetView, viewport)
+
+	//
+	var msg w32.MSG
+	for msg.Message != w32.WM_QUIT {
+		if w32.PeekMessage(&msg, 0, 0, 0, w32.PM_REMOVE) {
+			w32.TranslateMessage(&msg)
+			w32.DispatchMessage(&msg)
+			fmt.Printf("message %d\n", msg.Message)
+		} else {
+			// Just clear the backbuffer
+			var midnightBlue = [4]float32{0.098039225, 0.098039225, 0.439215720, 1.000000000}
+			immediateContext.ClearRenderTargetView(renderTargetView, midnightBlue)
+			swapChain.Present(0, 0)
+			fmt.Printf("render\n")
+		}
+	}
 }
 
 func openWindow(

@@ -116,8 +116,6 @@ func main() {
 				},
 			},
 		}...)
-		// TODO(Jae): move constants from printer.go to this area so JSON files have
-		// all the data needed.
 		project.Files = append(project.Files, file)
 	}
 	for _, filename := range files {

@@ -68,10 +68,15 @@ func transformParameters(parameters []types.StructField) []types.StructField {
 
 			// Convert previous param to array length parameter
 			lastParam := &parameters[i-1]
-			param.Name = lastParam.Name
-			param.IsArrayLen = true
-			firstPrevHasECount = false
-			continue
+			if lastParam.HasECount {
+				//fmt.Printf("%s -- %s\n", param.TypeInfo.Ident, lastParam.TypeInfo.Ident)
+				if lastParam.TypeInfo.Ident == "D3D_FEATURE_LEVEL" {
+					param.Name = lastParam.Name
+					param.IsArrayLen = true
+					firstPrevHasECount = false
+					continue
+				}
+			}
 		}
 		param.Name = transformIdent(param.Name)
 		param.TypeInfo.GoType = transformIdent(typetrans.GoTypeFromTypeInfo(param.TypeInfo))
@@ -97,7 +102,10 @@ func transformParameters(parameters []types.StructField) []types.StructField {
 		firstPrevHasECount = param.HasECount
 		switch typeInfo := param.TypeInfo.Type.(type) {
 		case *types.Pointer:
-			param.IsDeref = param.TypeInfo.Ident == "void" && typeInfo.Depth == 2
+			//if param.TypeInfo.GoType == "uintptr" {
+			//	param.IsDeref = true
+			//}
+			param.IsDeref = typeInfo.Depth == 2 && (param.TypeInfo.Ident == "void" || param.TypeInfo.Ident == "IUnknown")
 		case *types.FunctionPointer:
 			typeInfo.Ident = transformIdent(param.Name)
 			typeInfo.Parameters = transformParameters(typeInfo.Parameters)

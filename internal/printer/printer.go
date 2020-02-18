@@ -355,28 +355,37 @@ func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) 
 	{
 		i := 0
 		for _, param := range parameters {
-			if param.IsDeref {
-				// Skip as we put deref's as input parameters
+			if !param.IsOut {
 				continue
+			}
+			if param.IsDeref {
+				continue
+				/*if ind > 0 {
+					// Skip as we put deref's as input parameters
+					// - REFIID riid
+					// - __RPC__deref_out  void **ppvObject
+					prevParam := parameters[ind-1]
+					if prevParam.TypeInfo.Ident == "REFIID" {
+						continue
+					}
+				}*/
 			}
 			if param.IsArrayLen {
 				// Skip as Go users dont need to pass an array len
 				// they just pass a slice
 				continue
 			}
-			if param.IsOut {
-				if i != 0 {
-					b.WriteString(", ")
-				}
-				goType := param.TypeInfo.GoType
-				if len(goType) > 0 && goType[0] == '*' {
-					goType = goType[1:]
-				}
-				b.WriteString(param.Name)
-				b.WriteRune(' ')
-				b.WriteString(goType)
-				i++
+			if i != 0 {
+				b.WriteString(", ")
 			}
+			goType := param.TypeInfo.GoType
+			if len(goType) > 0 && goType[0] == '*' {
+				goType = goType[1:]
+			}
+			b.WriteString(param.Name)
+			b.WriteRune(' ')
+			b.WriteString(goType)
+			i++
 		}
 		if i > 0 {
 			b.WriteString(", ")
