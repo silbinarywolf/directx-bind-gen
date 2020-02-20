@@ -274,6 +274,11 @@ var (
 
 func printArgument(b *bytes.Buffer, param types.StructField) {
 	name := param.Name
+	if param.IsArray {
+		//b.WriteString("\t\tuintptr(len(" + name + ")),\n")
+		b.WriteString("\t\tuintptr(unsafe.Pointer(&" + name + "[0])),\n")
+		return
+	}
 	if param.IsArrayLen {
 		b.WriteString("\t\tuintptr(len(" + name + ")),\n")
 		return
@@ -286,11 +291,6 @@ func printArgument(b *bytes.Buffer, param types.StructField) {
 	}
 	switch param.TypeInfo.Type.(type) {
 	case *types.Pointer:
-		if param.HasECount {
-			//b.WriteString("\t\tuintptr(len(" + name + ")),\n")
-			b.WriteString("\t\tuintptr(unsafe.Pointer(&" + name + "[0])),\n")
-			break
-		}
 		if param.IsOut {
 			b.WriteString("\t\tuintptr(unsafe.Pointer(&" + name + ")),\n")
 			break

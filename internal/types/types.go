@@ -74,6 +74,8 @@ type StructField struct {
 	// field, this normally means the next field is a UINT
 	// representing how many are in an array
 	HasECount bool
+	// IsArray is when the field is most likely a dynamic array
+	IsArray bool
 	// IsArrayLen is true when field(s) are meant to represent
 	// the length of an array of data.
 	IsArrayLen bool
@@ -175,4 +177,22 @@ func NewPointer(ident string, data Pointer) TypeInfo {
 		Ident: ident,
 		Type:  &data,
 	}
+}
+
+func IsECountArray(param *StructField) bool {
+	//fmt.Printf("param: %s\n", param.Name)
+	if param.Name == "ppRenderTargetViews" {
+		return false
+	}
+	typeInfo, ok := param.TypeInfo.Type.(*Pointer)
+	if !ok {
+		return false
+	}
+	switch typeInfo.Depth {
+	case 1:
+		return true
+	case 2:
+		return true
+	}
+	return false
 }

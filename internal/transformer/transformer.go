@@ -16,15 +16,15 @@ func Transform(file *types.File) {
 	for i := 0; i < len(file.Functions); i++ {
 		record := &file.Functions[i]
 		record.Ident = transformIdent(record.Ident)
-		record.Parameters = transformParameters(record.Parameters)
+		record.Parameters = transformParameters(record.Parameters, true)
 	}
 	for i := 0; i < len(file.Structs); i++ {
 		record := &file.Structs[i]
 		record.Ident = transformIdent(record.Ident)
-		record.Fields = transformParameters(record.Fields)
+		record.Fields = transformParameters(record.Fields, false)
 		if record := record.VtblStruct; record != nil {
 			record.Ident = transformIdent(record.Ident)
-			record.Fields = transformParameters(record.Fields)
+			record.Fields = transformParameters(record.Fields, false)
 		}
 	}
 	for i := 0; i < len(file.TypeAliases); i++ {
@@ -53,63 +53,70 @@ func Transform(file *types.File) {
 	}
 }
 
-func transformParameters(parameters []types.StructField) []types.StructField {
-	firstPrevHasECount := false
-	for i := 0; i < len(parameters); i++ {
-		param := &parameters[i]
-		if param.Name == "NumViews" ||
-			param.Name == "NumViewports" {
-			// Hack to handle this case:
-			// - OMSetRenderTargets(NumViews)
-			// - RSSetViewports(NumViewports)
-			param.Name = parameters[i+1].Name
-			param.IsArrayLen = true
-			continue
-		}
-		if firstPrevHasECount {
-			// Delete this field if previous has an _ecount
-			// annotation, as its most likely a dynamic array
-			//parameters = append(parameters[:i], parameters[i+1:]...)
-			/*if i >= len(parameters) {
-				break
-			}
-			param = &parameters[i]*/
-
-			// Convert previous param to array length parameter
-			lastParam := &parameters[i-1]
-			if lastParam.HasECount {
-				// Add metadata for this case so we can just pass in a slice for Golang
-				if lastParam.TypeInfo.Ident == "D3D_FEATURE_LEVEL" ||
-					lastParam.Name == "NumViews" {
-					param.Name = lastParam.Name
+func transformParameters(parameters []types.StructField, isFunction bool) []types.StructField {
+	// Annotate with custom metadata
+	if isFunction {
+		//firstPrevHasECount := false
+		for i := 0; i < len(parameters); i++ {
+			param := &parameters[i]
+			if i+1 < len(parameters) &&
+				(strings.HasPrefix(param.Name, "Num") &&
+					param.Name != "NumElements") ||
+				param.Name == "FeatureLevels" {
+				// Hack to handle this case:
+				// - OMSetRenderTargets(NumViews)
+				// - RSSetViewports(NumViewports)
+				nextParam := &parameters[i+1]
+				if types.IsECountArray(nextParam) {
+					param.Name = nextParam.Name
+					nextParam.IsArray = true
 					param.IsArrayLen = true
-					firstPrevHasECount = false
 					continue
 				}
 			}
-		}
-		param.Name = transformIdent(param.Name)
-		//param.TypeInfo.GoType = transformIdent(typetrans.GoTypeFromTypeInfo(param.TypeInfo))
-		if param.HasECount {
-			switch typeInfo := param.TypeInfo.Type.(type) {
-			case *types.Pointer:
-				switch typeInfo.Depth {
-				case 1:
-					param.TypeInfo.GoType = "[]" + transformIdent(typetrans.GoTypeFromTypeInfo(typeInfo.TypeInfo))
-				case 2:
-					param.TypeInfo.GoType = "[]" + transformIdent(typetrans.GoTypeFromTypeInfo(typeInfo.TypeInfo))
-					// no-op
-					// param.TypeInfo.GoType = transformIdent(typetrans.GoTypeFromTypeInfo(typeInfo.TypeInfo.Ident))
-				default:
-					panic(fmt.Sprintf("Unhandled pointer depth: %d", typeInfo.Depth))
+			if i > 0 {
+				// Convert previous param to array length parameter
+				prevParam := &parameters[i-1]
+				if prevParam.HasECount {
+					// Add metadata for this case so we can just pass in a slice for Golang
+					if prevParam.TypeInfo.Ident == "D3D_FEATURE_LEVEL" {
+						/* lastParam.Name == "NumViews"*/
+						param.Name = prevParam.Name
+						prevParam.IsArray = true
+						param.IsArrayLen = true
+						//firstPrevHasECount = false
+						continue
+					}
 				}
-			default:
-				panic(fmt.Sprintf("Unhandled ecount type: %T", param.TypeInfo))
 			}
-		} else {
-			param.TypeInfo.GoType = transformIdent(typetrans.GoTypeFromTypeInfo(param.TypeInfo))
 		}
-		firstPrevHasECount = param.HasECount
+	}
+
+	// Transform idents / etc
+	for i := 0; i < len(parameters); i++ {
+		param := &parameters[i]
+		param.Name = transformIdent(param.Name)
+		param.TypeInfo.GoType = transformIdent(typetrans.GoTypeFromTypeInfo(param.TypeInfo))
+		switch typeInfo := param.TypeInfo.Type.(type) {
+		case *types.Pointer:
+			if param.HasECount {
+				if param.IsArray {
+					param.TypeInfo.GoType = "[]" + transformIdent(typetrans.GoTypeFromTypeInfo(typeInfo.TypeInfo))
+				} else {
+					switch typeInfo.Depth {
+					case 1:
+						param.TypeInfo.GoType = "*" + transformIdent(typetrans.GoTypeFromTypeInfo(typeInfo.TypeInfo))
+					case 2:
+						param.TypeInfo.GoType = "**" + transformIdent(typetrans.GoTypeFromTypeInfo(typeInfo.TypeInfo))
+						// no-op
+						// param.TypeInfo.GoType = transformIdent(typetrans.GoTypeFromTypeInfo(typeInfo.TypeInfo.Ident))
+					default:
+						panic(fmt.Sprintf("Unhandled pointer depth: %d", typeInfo.Depth))
+					}
+				}
+			}
+		}
+
 		switch typeInfo := param.TypeInfo.Type.(type) {
 		case *types.Pointer:
 			//if param.TypeInfo.GoType == "uintptr" {
@@ -130,7 +137,7 @@ func transformParameters(parameters []types.StructField) []types.StructField {
 			}
 		case *types.FunctionPointer:
 			typeInfo.Ident = transformIdent(param.Name)
-			typeInfo.Parameters = transformParameters(typeInfo.Parameters)
+			typeInfo.Parameters = transformParameters(typeInfo.Parameters, true)
 		}
 	}
 	return parameters

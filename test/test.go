@@ -143,8 +143,8 @@ func Example() {
 	if err != nil {
 		panic(err.Error())
 	}
-	immediateContext.OMSetRenderTargets([]d3d11.RenderTargetView{renderTargetView}, nil)
-	viewport := &d3d11.VIEWPORT{
+	immediateContext.OMSetRenderTargets(1, renderTargetView, nil)
+	viewport := d3d11.VIEWPORT{
 		Width:    windowWidth,
 		Height:   windowHeight,
 		MinDepth: 0.0,
