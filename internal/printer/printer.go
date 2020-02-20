@@ -381,6 +381,9 @@ func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) 
 			goType := param.TypeInfo.GoType
 			if len(goType) > 0 && goType[0] == '*' {
 				goType = goType[1:]
+				/*if len(goType) > 0 && goType[0] == '*' {
+					goType = "[]" + goType
+				}*/
 			}
 			b.WriteString(param.Name)
 			b.WriteRune(' ')

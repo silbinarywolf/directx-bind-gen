@@ -57,6 +57,15 @@ func transformParameters(parameters []types.StructField) []types.StructField {
 	firstPrevHasECount := false
 	for i := 0; i < len(parameters); i++ {
 		param := &parameters[i]
+		if param.Name == "NumViews" ||
+			param.Name == "NumViewports" {
+			// Hack to handle this case:
+			// - OMSetRenderTargets(NumViews)
+			// - RSSetViewports(NumViewports)
+			param.Name = parameters[i+1].Name
+			param.IsArrayLen = true
+			continue
+		}
 		if firstPrevHasECount {
 			// Delete this field if previous has an _ecount
 			// annotation, as its most likely a dynamic array
@@ -69,8 +78,9 @@ func transformParameters(parameters []types.StructField) []types.StructField {
 			// Convert previous param to array length parameter
 			lastParam := &parameters[i-1]
 			if lastParam.HasECount {
-				//fmt.Printf("%s -- %s\n", param.TypeInfo.Ident, lastParam.TypeInfo.Ident)
-				if lastParam.TypeInfo.Ident == "D3D_FEATURE_LEVEL" {
+				// Add metadata for this case so we can just pass in a slice for Golang
+				if lastParam.TypeInfo.Ident == "D3D_FEATURE_LEVEL" ||
+					lastParam.Name == "NumViews" {
 					param.Name = lastParam.Name
 					param.IsArrayLen = true
 					firstPrevHasECount = false
@@ -79,7 +89,7 @@ func transformParameters(parameters []types.StructField) []types.StructField {
 			}
 		}
 		param.Name = transformIdent(param.Name)
-		param.TypeInfo.GoType = transformIdent(typetrans.GoTypeFromTypeInfo(param.TypeInfo))
+		//param.TypeInfo.GoType = transformIdent(typetrans.GoTypeFromTypeInfo(param.TypeInfo))
 		if param.HasECount {
 			switch typeInfo := param.TypeInfo.Type.(type) {
 			case *types.Pointer:
@@ -105,7 +115,19 @@ func transformParameters(parameters []types.StructField) []types.StructField {
 			//if param.TypeInfo.GoType == "uintptr" {
 			//	param.IsDeref = true
 			//}
-			param.IsDeref = typeInfo.Depth == 2 && (param.TypeInfo.Ident == "void" || param.TypeInfo.Ident == "IUnknown")
+			switch typeInfo.Depth {
+			case 1:
+				switch param.TypeInfo.Ident {
+				case "ID3D11Resource": // Resource would ideally convert to a custom interface for Golang, but this is lazier/quicker
+					param.IsDeref = true
+				}
+			case 2:
+				switch param.TypeInfo.Ident {
+				case "void",
+					"IUnknown":
+					param.IsDeref = true
+				}
+			}
 		case *types.FunctionPointer:
 			typeInfo.Ident = transformIdent(param.Name)
 			typeInfo.Parameters = transformParameters(typeInfo.Parameters)

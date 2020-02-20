@@ -143,7 +143,7 @@ func Example() {
 	if err != nil {
 		panic(err.Error())
 	}
-	immediateContext.OMSetRenderTargets(1, &renderTargetView, nil)
+	immediateContext.OMSetRenderTargets([]d3d11.RenderTargetView{renderTargetView}, nil)
 	viewport := &d3d11.VIEWPORT{
 		Width:    windowWidth,
 		Height:   windowHeight,
@@ -152,7 +152,7 @@ func Example() {
 		TopLeftX: 0,
 		TopLeftY: 0,
 	}
-	immediateContext.RSSetViewports(1, viewport)
+	immediateContext.RSSetViewports([]d3d11.VIEWPORT{viewport})
 	fmt.Printf(`
 		renderTargetView: %v
 		viewports: %v
