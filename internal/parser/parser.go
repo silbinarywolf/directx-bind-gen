@@ -773,6 +773,7 @@ FieldLoop:
 		if s.TokenText() == "(" {
 			panic(s.String() + ": unexpected token: " + s.TokenText() + " after type: " + kind)
 		}
+		// Get *const pointer or just * info
 		pointerDepth := parsePointerDepth(s)
 		switch v := s.TokenText(); v {
 		case "const":
@@ -785,8 +786,8 @@ FieldLoop:
 			// TODO(Jae): Flag this type as "const"?
 			//kind = kind + " " + v
 
-			// Re-read pointer depth for the type
-			pointerDepth = parsePointerDepth(s)
+			// Re-read pointer info after *const
+			pointerDepth += parsePointerDepth(s)
 		}
 		name := s.TokenText()
 		//panic(s.String() + ": debug " + kind + " " + name)
