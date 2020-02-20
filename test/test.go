@@ -74,15 +74,32 @@ func Example() {
 	if err != nil {
 		panic(err)
 	}
-	//var dxgiFactory *d3d11.IDXGIFactory1
+
+	// Obtain DXGI factory from device (since we used 0 for adapter above)
+	var dxgiFactory *d3d11.IDXGIFactory1
 	{
 		var dxgiDevice *d3d11.IDXGIDevice
 		if err := device.QueryInterface(dxgiDevice.GUID(), &dxgiDevice); err != nil {
 			panic(err)
 		}
+		adapter, err := dxgiDevice.GetAdapter()
+		if err != nil {
+			panic(err)
+		}
+		if err := adapter.GetParent(dxgiFactory.GUID(), &dxgiFactory); err != nil {
+			panic(err)
+		}
+		adapter.Release()
+		dxgiDevice.Release()
+		if err != nil {
+			panic(err)
+		}
 		fmt.Printf(`
-			dxgiDevice: %v
-		`, dxgiDevice)
+			IDXGIDevice: %v
+			Adapter: %v
+			dxgiFactory: %v
+			Error: %v
+		`, dxgiDevice, adapter, dxgiFactory, err)
 	}
 
 	fmt.Printf(`
@@ -91,6 +108,71 @@ func Example() {
 		immediateContext: %v
 		err: %v
 	`, device, featureLevel, immediateContext, err)
+
+	// DirectX 11.0 systems
+	var swapChain *d3d11.IDXGISwapChain
+	{
+		sd := d3d11.DXGI_SWAP_CHAIN_DESC{}
+		sd.BufferCount = 1
+		sd.BufferDesc.Width = windowWidth
+		sd.BufferDesc.Height = windowHeight
+		sd.BufferDesc.Format = d3d11.DXGI_FORMAT_R8G8B8A8_UNORM
+		sd.BufferDesc.RefreshRate.Numerator = 60
+		sd.BufferDesc.RefreshRate.Denominator = 1
+		sd.BufferUsage = d3d11.DXGI_USAGE_RENDER_TARGET_OUTPUT
+		sd.OutputWindow = d3d11.HWND(window)
+		sd.SampleDesc.Count = 1
+		sd.SampleDesc.Quality = 0
+		sd.Windowed = 1
+		swapChain, err = dxgiFactory.CreateSwapChain(device, &sd)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+
+	// Note this tutorial doesn't handle full-screen swapchains so we block the ALT+ENTER shortcut
+	dxgiFactory.MakeWindowAssociation(d3d11.HWND(window), d3d11.DXGI_MWA_NO_ALT_ENTER)
+	dxgiFactory.Release()
+
+	var backBuffer *d3d11.Texture2D
+	if err := swapChain.GetBuffer(0, backBuffer.GUID(), &backBuffer); err != nil {
+		panic(err.Error())
+	}
+	renderTargetView, err := device.CreateRenderTargetView(backBuffer, nil)
+	backBuffer.Release()
+	if err != nil {
+		panic(err.Error())
+	}
+	immediateContext.OMSetRenderTargets(1, &renderTargetView, nil)
+	viewport := d3d11.VIEWPORT{
+		Width:    windowWidth,
+		Height:   windowHeight,
+		MinDepth: 0.0,
+		MaxDepth: 0.0,
+		TopLeftX: 0,
+		TopLeftY: 0,
+	}
+	immediateContext.RSSetViewports([]d3d11.VIEWPORT{viewport})
+	fmt.Printf(`
+		renderTargetView: %v
+		viewports: %v
+	`, renderTargetView, viewport)
+
+	//
+	var msg w32.MSG
+	for msg.Message != w32.WM_QUIT {
+		if w32.PeekMessage(&msg, 0, 0, 0, w32.PM_REMOVE) {
+			w32.TranslateMessage(&msg)
+			w32.DispatchMessage(&msg)
+			fmt.Printf("message %d\n", msg.Message)
+		} else {
+			// Just clear the backbuffer
+			var midnightBlue = [4]float32{0.098039225, 0.098039225, 0.439215720, 1.000000000}
+			immediateContext.ClearRenderTargetView(renderTargetView, midnightBlue)
+			swapChain.Present(0, 0)
+			fmt.Printf("render\n")
+		}
+	}
 }
 
 func openWindow(

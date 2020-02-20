@@ -13,12 +13,92 @@ import (
 	"github.com/silbinarywolf/directx-bind-gen/internal/typetrans"
 )
 
+var precedence = map[string]int{
+	"(":  1,
+	")":  1,
+	"||": 2,
+	"&&": 2,
+	"==": 3,
+	"!=": 3, // NOTE(Jae): 2018(?) - Didn't check this against other langs
+	// NOTE(Jae): 2020-02-18
+	// Need << and >> to have a precdence lower than +, -, /, *
+	// otherwise DXGI_USAGE_SHADER_INPUT ends up not being expected 16
+	// (im unsure of if this means the parentheses are handled incorrectly
+	// but whatever for this use-case for now)
+	"<<": 4,
+	">>": 4,
+	"+":  5,
+	"-":  5,
+	"/":  5,
+	"*":  5,
+	// NOTE(Jae): 2020-02-18
+	// Everything under here is naively copied from and untested
+	// https://en.wikipedia.org/wiki/Operators_in_C_and_C%2B%2B
+	"<":  9,
+	"<=": 9,
+	">":  9,
+	">=": 9,
+}
+
+func OperatorPrecedence(operator string) int {
+	r, ok := precedence[operator]
+	if !ok {
+		panic("Invalid operator, no precedence found: " + operator)
+	}
+	return r
+}
+
+func IsOperator(operator string) bool {
+	c := operator[0]
+	return c == '<' ||
+		c == '+' ||
+		c == '-' ||
+		operator == "<<" ||
+		operator == ">>" ||
+		operator == "++"
+}
+
+func IsNumber(str string) bool {
+	c := str[0]
+	return c >= '0' && c <= '9'
+}
+
+func IsIdent(str string) bool {
+	c := str[0]
+	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+}
+
+func NumberToFloat64(str string) float64 {
+	if len(str) > 1 &&
+		str[0] == '0' &&
+		str[1] == 'x' {
+		i, err := strconv.ParseInt(str[2:], 16, 0)
+		if err != nil {
+			panic("Failed to parse hex value.")
+		}
+		return float64(i)
+	}
+	i, err := strconv.ParseInt(str, 10, 0)
+	if err != nil {
+		panic(fmt.Sprintf("Tried to parse int and failed: %s", str))
+	}
+	return float64(i)
+}
+
 func ParseFile(filename string) types.File {
 	f, err := os.Open(filename)
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
+
+	// structIdentToGuid is used to attach GUID/IID data
+	// to a struct
+	structIdentToGuid := make(map[string]string)
+	vtblStructIdentToData := make(map[string]*types.Struct)
+
+	//
+	defineValuesMap := make(map[string]string)
 
 	var file types.File
 	file.Filename = filename
@@ -27,62 +107,279 @@ func ParseFile(filename string) types.File {
 	s.Init(f)
 	s.Filename = filename
 	s.Mode = scanner.GoTokens //^= scanner.SkipComments // don't skip comments
-	//MainLoop:
+MainLoop:
 	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
 		switch s.TokenText() {
 		case "#":
 			s.Scan()
 			switch s.TokenText() {
-			case "define":
-				// todo(Jae): 2020-01-28
-				// Store define constants...
-
+			case "define", "DEFINE":
+				//constIdentPos := s.Pos()
+				s.Scan()
+				constIdent := s.TokenText()
+				if constIdent == "INTERFACE" {
+					// Ignore cases like:
+					// #undef INTERFACE
+					// #define INTERFACE ID3D10ShaderReflection1
+					continue
+				}
+				if constIdent == "IID_ID3DBlob" {
+					// Ignore cases like:
+					// - #define IID_ID3DBlob IID_ID3D10Blob
+					continue
+				}
 				// A few cases to handle:
 				// - #define _INCLUDE_H
 				// - #define D3D_CONST ( 3 )
 				// - #DEFINE DX_VERSION 455
-				// Need to avoid consuming too many tokens ahead or else we accidentally
-				// skip the D3D11_INPUT_ELEMENT_DESC struct
-
-				// Skip until newline for now
+				var exprTokens []string
 				{
+					skipThisMacro := false
 					oldMode := s.Mode
 					oldWhitespace := s.Whitespace
-					s.Mode ^= scanner.GoWhitespace
 					// https://golang.org/pkg/text/scanner/#example__whitespace
-					s.Whitespace ^= 1<<'\t' | 1<<'\n' // don't skip tabs and new lines
+					//s.Mode ^= scanner.GoWhitespace
+					//s.Whitespace ^= 1<<'\t' | 1<<'\n' // don't skip tabs and new lines
+					// TODO(Jae): confirm this works
+					s.Whitespace ^= 1 << '\n'
 					for {
+						prevPos := s.Pos()
 						s.Scan()
+						nextPos := s.Pos()
 						v := s.TokenText()
-						// For debugging
-						// fmt.Printf("%v\n", []byte(v))
+						v = strings.TrimSpace(v)
+						if v == "\\" {
+							continue
+						}
 						if v == "" || v == "\n" {
 							break
 						}
+						// Handle cases like:
+						// - #define MAKE_D3D11_HRESULT( code )  MAKE_HRESULT( 1, _FACD3D11, code )
+						if v == "(" {
+							// Ignore non-trivial macros like:
+							// - #define __in_range(x, y)
+							if len(exprTokens) == 0 &&
+								prevPos.Offset == nextPos.Offset-1 {
+								skipThisMacro = true
+								break
+							}
+							// Ignore non-trivial macros like:
+							// - #define MAKE_D3D11_HRESULT( code )  MAKE_HRESULT( 1, _FACD3D11, code )
+							if len(exprTokens) > 0 &&
+								IsIdent(exprTokens[len(exprTokens)-1]) &&
+								// ie. 49 == 50-1, for the case MAKE_HRESULT
+								prevPos.Column == nextPos.Column-1 {
+								skipThisMacro = true
+								break
+							}
+						}
+						exprTokens = append(exprTokens, v)
 					}
 					s.Mode = oldMode
 					s.Whitespace = oldWhitespace
+					if skipThisMacro {
+						continue MainLoop
+					}
 				}
-				//s.Scan()
-				//macroName := s.TokenText()
-
-				// do nothing with #define so far
-				//fmt.Printf("def: %s %s\n", macroName, tok)
-			}
-			// Read macro until end of line
-			// TODO(Jae): account for the newline backslash thing? ie.
-			/*startLine := s.Line
-			if s.lastLineLen > 0 {
-				startLine++
-			}
-			for tok = s.Scan(); tok != scanner.EOF && line == s.Line; tok = s.Scan() {
-				line := s.Scan
-				if s.lastLineLen > 0 {
-
+				if len(exprTokens) == 0 {
+					continue
 				}
-				// scan until end of line
-				//fmt.Printf("LINE111 tar: %d, actu: %d\n", line, s.Line)
-			}*/
+
+				// Based on a Pratt Expression Parser
+				// - http://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/
+				infixNodes := make([]string, 0, 10)
+				{
+					//hasNumberOrOperator := false
+					parenOpenCount := 0
+					parenCloseCount := 0
+					//expectOperator := false
+					operatorNodes := make([]string, 0, 10)
+				Loop:
+					for len(exprTokens) > 0 {
+						t := exprTokens[0]
+						exprTokens = exprTokens[1:]
+						switch t {
+						//case ",":
+						// Ignore function macros like:
+						// - #define __in_range(x, y)
+						//continue MainLoop
+						case "(":
+							/*if len(infixNodes) > 0 &&
+								IsIdent(infixNodes[len(infixNodes)-1]) {
+								// Ignore "complex" macros like:
+								// - #define MAKE_D3D11_HRESULT( code )  MAKE_HRESULT( 1, _FACD3D11, code )
+								continue MainLoop
+							}*/
+							parenOpenCount++
+						case ")":
+							// If hit end
+							if parenCloseCount == 0 && parenOpenCount == 0 {
+								break Loop
+							}
+							parenCloseCount++
+							// I actually dont remember why this needs to be here.
+							// But OK. Copy-pasted from old expression evaluation code
+							// on an old compiler project
+							if len(operatorNodes) > 0 {
+								topOperatorNode := operatorNodes[len(operatorNodes)-1]
+								if topOperatorNode == "(" {
+									infixNodes = append(infixNodes, topOperatorNode)
+									operatorNodes = operatorNodes[:len(operatorNodes)-1]
+								}
+							}
+						case "L":
+							// ( 1L << (0 + 4) )
+							// Ignore for now, its to hint that this macro is:
+							// "....an integer constant which has long int type instead of int."
+							continue
+						case "UL":
+							// ( 1UL )
+							// Ignore for now, its to hint that this macro is:
+							// "....an integer constant which has unsigned long int type instead of int."
+							continue
+						case "f":
+							// add f to number, ie. "1.0f"
+							if len(infixNodes) == 0 {
+								panic("Unexpected error. Cannot add f to number for #define: " + constIdent)
+							}
+							// Ignore for now. Its a hint that this type is a float.
+							//infixNodes[len(infixNodes)-1] += "f"
+						default:
+							if IsNumber(t) || IsIdent(t) {
+								infixNodes = append(infixNodes, t)
+								continue
+							}
+							if IsOperator(t) {
+								// Handle <<, ++, etc
+								if len(operatorNodes) > 0 {
+									prevOp := operatorNodes[len(operatorNodes)-1]
+									if t == prevOp {
+										operatorNodes = operatorNodes[:len(operatorNodes)-1]
+										t += prevOp
+									}
+								}
+								// Handle operators
+								for len(operatorNodes) > 0 {
+									topOperatorNode := operatorNodes[len(operatorNodes)-1]
+									if OperatorPrecedence(topOperatorNode) < OperatorPrecedence(t) {
+										break
+									}
+									operatorNodes = operatorNodes[:len(operatorNodes)-1]
+									infixNodes = append(infixNodes, topOperatorNode)
+								}
+								operatorNodes = append(operatorNodes, t)
+								continue
+							}
+							panic("Unhandled expression token: " + t + " for #define: " + constIdent)
+						}
+					}
+
+					for len(operatorNodes) > 0 {
+						topOperatorNode := operatorNodes[len(operatorNodes)-1]
+						operatorNodes = operatorNodes[:len(operatorNodes)-1]
+						infixNodes = append(infixNodes, topOperatorNode)
+					}
+					if parenOpenCount != parenCloseCount {
+						// todo(Jae): better error message
+						panic("Mismatching paren open and close count")
+					}
+				}
+				// Evaluate expression
+				stack := make([]string, 0, 10)
+				for len(infixNodes) > 0 {
+					t := infixNodes[0]
+					infixNodes = infixNodes[1:]
+					if IsNumber(t) {
+						stack = append(stack, t)
+						continue
+					}
+					if IsOperator(t) {
+						rightValue := stack[len(stack)-1]
+						stack = stack[:len(stack)-1]
+						if len(stack) == 0 {
+							//if t == "<<" {
+							//	panic("Cant prefix a value with: " + t)
+							//}
+							// Operator only, ie. -42
+							// ie. t = "-", rightValue="42"
+							stack = append(stack, t+rightValue)
+							continue
+						}
+						leftValue := stack[len(stack)-1]
+						stack = stack[:len(stack)-1]
+						leftValueFloat64 := NumberToFloat64(leftValue)
+						rightValueFloat64 := NumberToFloat64(rightValue)
+						switch t {
+						case "+":
+							result := leftValueFloat64 + rightValueFloat64
+							//fmt.Printf("Result: %v\n", result)
+							stack = append(stack, fmt.Sprintf("%v", result))
+							//panic("TODO: handle operator'ing two values together:\n" + leftValue + " " + t + " " + rightValue + " for #define: " + constIdent)
+							continue
+						case "<<":
+							result := uint64(leftValueFloat64) << uint64(rightValueFloat64)
+							//fmt.Printf("result: %d for const: %s\n", result, constIdent)
+							stack = append(stack, fmt.Sprintf("%d", result))
+						default:
+							panic("TODO: handle operator'ing two values together:\n" + leftValue + " " + t + " " + rightValue + " for #define: " + constIdent)
+						}
+						continue
+					}
+					if IsIdent(t) {
+						v, ok := defineValuesMap[t]
+						if !ok {
+							panic("Unable to find existing identifier: " + t + " for this #define: " + constIdent)
+						}
+						stack = append(stack, v)
+						continue
+					}
+					panic("Unhandled evaluation token: " + t + " for #define: " + constIdent)
+				}
+				if len(stack) == 0 {
+					panic("Unexpected error, empty stack from evaluating expression for #define: " + constIdent)
+				}
+				if len(stack) > 1 {
+					panic(fmt.Sprintf("Unexpected error, stack size is %d instead of 1 (%v) for #define: %s", len(stack), stack, constIdent))
+				}
+				result := stack[0]
+
+				defineValuesMap[constIdent] = result
+				// defineValuesMap
+				/*fmt.Printf(`
+					#define: %s
+					infix Nodes: %v
+				`, constIdent, infixNodes)
+				if len(infixNodes) > 1 {
+					panic(fmt.Sprintf("infix: %v\n", infixNodes))
+				}*/
+
+				// Add parsed macro
+				record := types.Macro{
+					Ident: constIdent,
+				}
+				record.StringValue = new(string)
+				*record.StringValue = result
+				file.Macros = append(file.Macros, record)
+			}
+		case "MIDL_INTERFACE":
+			s.Scan()
+			if tok := s.TokenText(); tok != "(" {
+				panic(s.String() + ": unexpected token: " + tok + " after MIDL_INTERFACE macro")
+			}
+			s.Scan()
+			guid := s.TokenText()
+			if guid[0] != '"' {
+				panic(s.String() + ": unexpected guid value doesn't start with \": " + guid)
+			}
+			guid = guid[1 : len(guid)-1] // trim quotes off either side
+			s.Scan()
+			if tok := s.TokenText(); tok != ")" {
+				panic(s.String() + ": unexpected token: " + tok + " after MIDL_INTERFACE data: " + guid)
+			}
+			s.Scan()
+			structName := s.TokenText()
+			structIdentToGuid[structName] = guid
 		case "typedef":
 			s.Scan()
 			kind := s.TokenText()
@@ -162,14 +459,7 @@ func ParseFile(filename string) types.File {
 					data.Fields = data.Fields[1:]
 				}
 				if isVtbl {
-					// NOTE(Jae): 2020-01-26
-					// A bit of a hack to determine the name. Should probably make
-					// this more robust but we'll see!
-					nonVtblIdent := strings.Replace(data.Ident, "Vtbl", "", 1)
-					if nonVtblIdent != data.Ident {
-						data.NonVtblIdent = nonVtblIdent
-					}
-					file.VtblStructs = append(file.VtblStructs, data)
+					vtblStructIdentToData[data.Ident] = &data
 				} else {
 					file.Structs = append(file.Structs, data)
 				}
@@ -236,6 +526,25 @@ func ParseFile(filename string) types.File {
 			file.Structs = append(file.Structs, data)
 		}
 	}
+
+	// Apply additional data
+	for i := 0; i < len(file.Structs); i++ {
+		record := &file.Structs[i]
+
+		// Apply GUID data to struct (if it exists)
+		if guid, ok := structIdentToGuid[record.Ident]; ok {
+			record.GUID = guid
+		}
+
+		// NOTE(Jae): 2020-01-26
+		// A bit of a hack to determine the name. Should probably make
+		// this more robust but we'll see!
+		determineVtblName := record.Ident + "Vtbl"
+		if vtblStruct, ok := vtblStructIdentToData[determineVtblName]; ok {
+			record.VtblStruct = vtblStruct
+		}
+	}
+
 	return file
 }
 
@@ -316,9 +625,9 @@ func parseFields(s *scanner.Scanner, endOfFieldToken string, endOfListToken stri
 	var fields []types.StructField
 FieldLoop:
 	for {
-		isOut := false
-		hasECount := false
+		var isOut, isDeref, hasECount bool
 
+		// Scan next field
 		s.Scan()
 		switch v := s.TokenText(); v {
 		case endOfListToken:
@@ -361,6 +670,7 @@ FieldLoop:
 			metaValue := s.TokenText()
 			if strings.HasPrefix(metaValue, "__") {
 				isOut = strings.Contains(metaValue, "_out")
+				isDeref = strings.Contains(metaValue, "_deref")
 				hasECount = strings.Contains(metaValue, "_ecount")
 
 				// Skip meta info like:
@@ -455,6 +765,7 @@ FieldLoop:
 				}),
 				Name:      callType,
 				IsOut:     isOut,
+				IsDeref:   isDeref,
 				HasECount: hasECount,
 			})
 			continue
@@ -462,6 +773,7 @@ FieldLoop:
 		if s.TokenText() == "(" {
 			panic(s.String() + ": unexpected token: " + s.TokenText() + " after type: " + kind)
 		}
+		// Get *const pointer or just * info
 		pointerDepth := parsePointerDepth(s)
 		switch v := s.TokenText(); v {
 		case "const":
@@ -474,8 +786,8 @@ FieldLoop:
 			// TODO(Jae): Flag this type as "const"?
 			//kind = kind + " " + v
 
-			// Re-read pointer depth for the type
-			pointerDepth = parsePointerDepth(s)
+			// Re-read pointer info after *const
+			pointerDepth += parsePointerDepth(s)
 		}
 		name := s.TokenText()
 		//panic(s.String() + ": debug " + kind + " " + name)
@@ -487,8 +799,7 @@ FieldLoop:
 		switch tok := s.TokenText(); tok {
 		case endOfFieldToken, endOfListToken:
 			// Simple type
-			typeInfo = types.NewBasicType(types.BasicType{})
-			typeInfo.Ident = kind
+			typeInfo = types.NewBasicType(kind, types.BasicType{})
 			if builtInTypeTrans, ok := typetrans.BuiltInTypeTranslation(kind); ok {
 				if builtInTypeTrans.Size == "ptr" {
 					typeInfo.Name = builtInTypeTrans.GoType[1:]
@@ -526,25 +837,24 @@ FieldLoop:
 					panic(s.String() + ": expected token: " + endOfFieldToken + " after array type: " + kind)
 				}
 			}
-			typeInfo = types.NewArray(types.Array{
+			typeInfo = types.NewArray(kind, types.Array{
 				Dimens: dimens,
 			})
-			typeInfo.Ident = kind
 		default:
 			panic(s.String() + ": expected [ or " + endOfFieldToken + " token, mishandled token:" + name)
 		}
 		if pointerDepth > 0 {
 			// Wrap in pointer type if applicable
-			typeInfo = types.NewPointer(types.Pointer{
+			typeInfo = types.NewPointer(kind, types.Pointer{
 				TypeInfo: typeInfo,
 				Depth:    pointerDepth,
 			})
-			typeInfo.Ident = kind
 		}
 		fields = append(fields, types.StructField{
 			TypeInfo:  typeInfo,
 			Name:      name,
 			IsOut:     isOut,
+			IsDeref:   isDeref,
 			HasECount: hasECount,
 		})
 		if isLastField {

@@ -2,51 +2,32 @@ package printer
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/silbinarywolf/directx-bind-gen/internal/types"
 	"github.com/silbinarywolf/directx-bind-gen/internal/typetrans"
 )
 
-const interfaceWithGuid = "d3dInterface"
+// interfaceWithGuid must be an interface{} as we want the user
+// to pass in a pointer-pointer to methods accepting a GUID/output value
+const interfaceWithGuid = "interface{}"
 
 func PrintProject(project *types.Project) []byte {
 	enumTypeTranslation := typetrans.EnumTypeTranslation()
+	constantAlreadyDefinedMap := make(map[string]bool)
 
 	// Output
 	var b bytes.Buffer
 	b.WriteString("package d3d11\n\n")
-	b.WriteString(`
+	b.WriteString(fmt.Sprintf(`
 import (
 	"syscall"
 	"strconv"
-	//"reflect"
+	"reflect"
 	"unsafe"
 )
-
-// guid describes a structure used to describe an identifier for a MAPI interface.
-// https://docs.microsoft.com/en-us/office/client-developer/outlook/mapi/iid
-//
-// implemented here too: https://github.com/golang/sys/blob/master/windows/types_windows.go#L1216
-type guid struct {
-	data1 uint32
-	data2 uint16
-	data3 uint16
-	data4 [8]byte
-}
-
-// rect structure defines a rectangle by the coordinates of its upper-left and lower-right corners.
-// https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-rect
-type Rect struct {
-	Left int32
-	Top int32
-	Right int32
-	Bottom int32
-}
-
-type d3dInterface interface {
-	guid() guid
-}
 
 // Error is returned by all Direct3D11 functions. It encapsulates the error code
 // returned by Direct3D. If a function succeeds it will return nil as the Error
@@ -84,12 +65,40 @@ var (
 	d3d11 = syscall.NewLazyDLL("d3d11.dll")
 )
 
-// E_INVALIDARG indicates that an invalid parameter was passed to the
-// returning function.
-const E_INVALIDARG = -2147024809
-
-`)
+`))
 	for _, file := range project.Files {
+		if len(file.Macros) > 0 {
+			hasMacro := false
+			for _, record := range file.Macros {
+				ident := record.Ident
+				if _, ok := constantAlreadyDefinedMap[ident]; ok {
+					continue
+				}
+				if strings.HasSuffix(ident, "_H_VERSION__") {
+					continue
+				}
+				value := record.Value.String()
+				if ident == value {
+					// ignore referencing self duplicates
+					continue
+				}
+				if !hasMacro {
+					b.WriteString("// Macros\n")
+					b.WriteString("const (\n")
+					hasMacro = true
+				}
+				b.WriteString("\t")
+				b.WriteString(ident)
+				b.WriteString(" = ")
+				b.WriteString(value)
+				b.WriteString("\n")
+				constantAlreadyDefinedMap[ident] = true
+			}
+			if hasMacro {
+				b.WriteString(")\n")
+			}
+			b.WriteString("\n")
+		}
 		for _, record := range file.Functions {
 			ident := record.Ident
 			callIdent := "call" + record.Ident
@@ -97,6 +106,7 @@ const E_INVALIDARG = -2147024809
 			b.WriteString("func " + ident)
 			printParametersAndReturns(&b, record.Parameters)
 			b.WriteString(" {\n")
+			printParameterInitVars(&b, record.Parameters)
 			b.WriteString("\tret, _, _ := ")
 			b.WriteString(callIdent)
 			b.WriteString(".Call(\n")
@@ -110,129 +120,129 @@ const E_INVALIDARG = -2147024809
 
 		}
 		for _, record := range file.Structs {
-			ident := record.Ident
-			b.WriteString("type " + ident + " struct {\n")
+			structIdent := record.Ident
+
+			b.WriteString("type " + structIdent + " struct {\n")
 			printStructFields(&b, record.Fields)
 			b.WriteString("}\n\n")
-		}
-		for _, record := range file.VtblStructs {
-			{
-				ident := record.Ident
-				b.WriteString("type " + ident + " struct {\n")
+
+			// Add GUID
+			// ie. "839d1216-bb2e-412b-b7f4-a9dbebe08ed1"
+			if len(record.GUID) > 0 {
+				// func (obj *Device) GUID() GUID {
+				b.WriteString("// GUID returns a string representing a Class identifier (ID) for COM objects\n")
+				b.WriteString("// ")
+				b.WriteString(record.GUID)
+				b.WriteString("\n")
+				b.WriteString("func (obj *" + structIdent + ") GUID() ")
+				b.WriteString(typetrans.GUIDTypeTranslation().GoType)
+				b.WriteString(" {\n")
+				b.WriteString("\treturn ")
+				b.WriteString(typetrans.GUIDTypeTranslation().GoType)
+				// Print "Data1" field
+				b.WriteString("{0x")
+				b.WriteString(record.GUID[:8])
+				// Print "Data2" field
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[9:13])
+				// Print "Data3" field
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[14:18])
+				// Print "Data4" field
+				b.WriteString(", [8]byte{")
+				b.WriteString("0x")
+				b.WriteString(record.GUID[19:21])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[21:23])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[24:26])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[26:28])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[28:30])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[30:32])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[32:34])
+				b.WriteString(", 0x")
+				b.WriteString(record.GUID[34:36])
+				b.WriteString("}}\n")
+				b.WriteString("}\n\n")
+			}
+
+			// Generate Vtbl
+			if record := record.VtblStruct; record != nil {
+				// Add vtbl struct and fields
+				b.WriteString("type " + record.Ident + " struct {\n")
 				printStructFields(&b, record.Fields)
 				b.WriteString("}\n\n")
-			}
 
-			structIdent := record.NonVtblIdent
-			if structIdent == "" {
-				panic("Unexpected error. Missing ident information for vtbl struct: " + record.Ident)
-			}
-			//
-			b.WriteString("func (obj *" + structIdent + ") guid() guid {\n")
-			// todo(Jae): Get real GUID from header file parsing
-			b.WriteString("\t// this is mocked, todo\n")
-			b.WriteString("\treturn guid{0x2411e7e1, 0x12ac, 0x4ccf, [8]byte{0xbd, 0x14, 0x97, 0x98, 0xe8, 0x53, 0x4d, 0xc0}}\n")
-			b.WriteString("}\n\n")
-			for _, field := range record.Fields {
-				typeInfo, ok := field.TypeInfo.Type.(*types.FunctionPointer)
-				if !ok {
-					continue
-				}
-				methodName := field.Name
-				parameters := typeInfo.Parameters
-				if parameters[0].Name != "This" {
-					panic("Expected first parameter of function pointer to be This.")
-				}
-				parameterCount := len(parameters)
-				parameters = parameters[1:]
-				b.WriteString("func (obj *" + structIdent + ") " + methodName)
-				printParametersAndReturns(&b, parameters)
-				b.WriteString(" {\n")
-				// Write init vars
-				for _, param := range parameters {
-					if param.TypeInfo.GoType == "REFIID" {
-						// NOTE(Jae): 2020-01-26
-						// After inspecting some of the DirectX11 header files
-						// it seems like REFIID is always the 2nd-last parameter.
-						// So we assume that here.
-						//outParam := parameters[i+1]
-						b.WriteString("\tvar refIIDValue uintptr\n") // := unsafe.Pointer(" + outParam.Name + ")\n")
-						b.WriteString("\t" + param.Name + "Guid" + " := " + param.Name + ".guid()\n")
-						break
+				for _, field := range record.Fields {
+					typeInfo, ok := field.TypeInfo.Type.(*types.FunctionPointer)
+					if !ok {
+						continue
 					}
-				}
-				// Write method body
-				b.WriteString("\t")
-				unusedParameterCount := 0
-				switch parameterCount {
-				case 0, 1, 2, 3:
-					b.WriteString("ret, _, _ := syscall.Syscall(\n")
-					unusedParameterCount = 3
-				case 4, 5, 6:
-					b.WriteString("ret, _, _ := syscall.Syscall6(\n")
-					unusedParameterCount = 6
-				case 7, 8, 9:
-					b.WriteString("ret, _, _ := syscall.Syscall9(\n")
-					unusedParameterCount = 9
-				case 10, 11, 12:
-					b.WriteString("ret, _, _ := syscall.Syscall12(\n")
-					unusedParameterCount = 12
-				default:
-					panic("Unhandled case: Parameter count too big: " + strconv.Itoa(parameterCount))
-				}
-				b.WriteString("\t\tobj.lpVtbl." + methodName + ",\n")
-				b.WriteString("\t\t" + strconv.Itoa(parameterCount) + ",\n")
-				b.WriteString("\t\tuintptr(unsafe.Pointer(obj)),\n")
-				for i, param := range parameters {
-					if param.TypeInfo.GoType == "REFIID" {
-						// NOTE(Jae): 2020-01-26
-						// After inspecting some of the DirectX11 header files
-						// it seems like REFIID is always the 2nd-last parameter.
-						// So we assume that here.
-						if i != len(parameters)-2 {
-							panic("Expected condition. Always expected REFIID to be second last parameter.")
-						}
-						outParam := parameters[i+1]
-						b.WriteString("\t\tuintptr(unsafe.Pointer(&" + outParam.Name + "Guid)),\n")
-						b.WriteString("\t\tuintptr(unsafe.Pointer(&refIIDValue)),\n")
-						break
+					methodName := field.Name
+					parameters := typeInfo.Parameters
+					if parameters[0].Name != "This" {
+						panic("Expected first parameter of function pointer to be This.")
 					}
-					printArgument(&b, param)
+					parameterCount := len(parameters)
+					parameters = parameters[1:]
+					b.WriteString("func (obj *" + structIdent + ") " + methodName)
+					printParametersAndReturns(&b, parameters)
+					b.WriteString(" {\n")
+					printParameterInitVars(&b, parameters)
+					// Write method body
+					b.WriteString("\t")
+					unusedParameterCount := 0
+					switch parameterCount {
+					case 0, 1, 2, 3:
+						b.WriteString("ret, _, _ := syscall.Syscall(\n")
+						unusedParameterCount = 3
+					case 4, 5, 6:
+						b.WriteString("ret, _, _ := syscall.Syscall6(\n")
+						unusedParameterCount = 6
+					case 7, 8, 9:
+						b.WriteString("ret, _, _ := syscall.Syscall9(\n")
+						unusedParameterCount = 9
+					case 10, 11, 12:
+						b.WriteString("ret, _, _ := syscall.Syscall12(\n")
+						unusedParameterCount = 12
+					default:
+						panic("Unhandled case: Parameter count too big: " + strconv.Itoa(parameterCount))
+					}
+					b.WriteString("\t\tobj.lpVtbl." + methodName + ",\n")
+					b.WriteString("\t\t" + strconv.Itoa(parameterCount) + ",\n")
+					b.WriteString("\t\tuintptr(unsafe.Pointer(obj)),\n")
+					for _, param := range parameters {
+						printArgument(&b, param)
+					}
+					for i := len(parameters); i < unusedParameterCount-1; i++ {
+						// Handle unused parameters for Syscall, Syscall6, etc
+						b.WriteString("\t\t0,\n")
+					}
+					b.WriteString("\t)\n")
+					b.WriteString("\terr = toErr(ret)\n")
+					b.WriteString("\treturn\n")
+					b.WriteString("}\n\n")
 				}
-				for i := len(parameters); i < unusedParameterCount-1; i++ {
-					// Handle unused parameters for Syscall, Syscall6, etc
-					b.WriteString("\t\t0,\n")
-				}
-				b.WriteString("\t)\n")
-				b.WriteString("\terr = toErr(ret)\n")
-				b.WriteString("\treturn\n")
-				//panic(fmt.Sprintf("%v\n", parameters))
-				// Release has to be called when finished using the object to free its
-				// associated resources.
-				/*func (obj *ID3D11Texture2D) Release() uint32 {
-					ret, _, _ := syscall.Syscall(
-						obj.vtbl.Release,
-						1,
-						uintptr(unsafe.Pointer(obj)),
-						0,
-						0,
-					)
-					return uint32(ret)
-				}*/
-
-				b.WriteString("}\n\n")
 			}
 		}
-		for _, typeAlias := range file.TypeAliases {
-			alias := typeAlias.Alias
-			if builtInTypeTrans, ok := typetrans.BuiltInTypeTranslation(alias); ok {
-				alias = builtInTypeTrans.GoType
+		if len(file.TypeAliases) > 0 {
+			b.WriteString("type (\n")
+			for _, typeAlias := range file.TypeAliases {
+				alias := typeAlias.Alias
+				if builtInTypeTrans, ok := typetrans.BuiltInTypeTranslation(alias); ok {
+					alias = builtInTypeTrans.GoType
+				}
+				ident := typeAlias.Ident
+				if ident == alias {
+					continue
+				}
+				b.WriteString("\t" + ident + " " + alias + "\n")
 			}
-			ident := typeAlias.Ident
-			if ident == alias {
-				continue
-			}
-			b.WriteString("type " + ident + " " + alias + "\n\n")
+			b.WriteString(")\n\n")
 		}
 		for _, record := range file.Enums {
 			ident := record.Ident
@@ -241,14 +251,7 @@ const E_INVALIDARG = -2147024809
 			b.WriteString("const (\n")
 			for _, field := range record.Fields {
 				fieldIdent := field.Ident
-				var value string
-				if field.UInt32Value != nil {
-					value = strconv.FormatUint(uint64(*field.UInt32Value), 10)
-				} else if field.StringValue != nil {
-					value = *field.StringValue
-				} else {
-					value = field.RawValue
-				}
+				value := field.Value.String()
 				if fieldIdent == value {
 					// ignore referencing self duplicates
 					continue
@@ -271,17 +274,23 @@ const E_INVALIDARG = -2147024809
 
 func printArgument(b *bytes.Buffer, param types.StructField) {
 	name := param.Name
+	if param.IsArray {
+		//b.WriteString("\t\tuintptr(len(" + name + ")),\n")
+		b.WriteString("\t\tuintptr(unsafe.Pointer(&" + name + "[0])),\n")
+		return
+	}
 	if param.IsArrayLen {
 		b.WriteString("\t\tuintptr(len(" + name + ")),\n")
 		return
 	}
+	if param.IsDeref {
+		b.WriteString("\t\tuintptr(unsafe.Pointer(" + name)
+		b.WriteString("Pointer")
+		b.WriteString(")),\n")
+		return
+	}
 	switch param.TypeInfo.Type.(type) {
 	case *types.Pointer:
-		if param.HasECount {
-			//b.WriteString("\t\tuintptr(len(" + name + ")),\n")
-			b.WriteString("\t\tuintptr(unsafe.Pointer(&" + name + "[0])),\n")
-			break
-		}
 		if param.IsOut {
 			b.WriteString("\t\tuintptr(unsafe.Pointer(&" + name + ")),\n")
 			break
@@ -297,12 +306,18 @@ func printArgument(b *bytes.Buffer, param types.StructField) {
 	b.WriteString("\t\t//" + param.Ident + "\n")
 	b.WriteString("\t\tuintptr(" + name + "),\n")*/
 	default:
-		b.WriteString("\t\tuintptr(" + name + "),\n")
+		if param.TypeInfo.GoType == typetrans.GUIDTypeTranslation().GoType {
+			// NOTE(Jae): 2020-02-09
+			// A bit of a hack to make GUID structs work. Might add
+			// "IsStruct" boolean in the future
+			b.WriteString("\t\tuintptr(unsafe.Pointer(&" + name + ")),\n")
+		} else {
+			b.WriteString("\t\tuintptr(" + name + "),\n")
+		}
 	}
 }
 
 func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) {
-	var outParam *types.StructField
 	b.WriteString("(")
 	{
 		i := 0
@@ -316,64 +331,69 @@ func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) 
 			if goType == "" {
 				panic("Expecting TypeInfo.GoType string to have value for Name: " + param.Name)
 			}
-			if goType == "REFIID" {
-				if i != 0 {
-					b.WriteString(", ")
-				}
-				// NOTE(Jae): 2020-01-26
-				// After inspecting some of the DirectX11 header files
-				// it seems like REFIID is always the 2nd-last parameter.
-				// So we assume that here.
-				outParam = &parameters[i+1]
-				b.WriteString(outParam.Name)
+			isDeref := param.IsDeref
+			if param.IsOut &&
+				!isDeref {
+				continue
+			}
+			if i != 0 {
+				b.WriteString(", ")
+			}
+			if param.IsDeref {
+				b.WriteString(param.Name)
 				b.WriteRune(' ')
 				b.WriteString(interfaceWithGuid)
-				break
-			}
-			if !param.IsOut {
-				if i != 0 {
-					b.WriteString(", ")
-				}
+			} else {
 				b.WriteString(param.Name)
 				b.WriteRune(' ')
 				b.WriteString(goType)
-				i++
 			}
+			i++
 		}
 	}
 	b.WriteString(") (")
 	{
 		i := 0
 		for _, param := range parameters {
+			if !param.IsOut {
+				continue
+			}
+			if param.IsDeref {
+				continue
+				/*if ind > 0 {
+					// Skip as we put deref's as input parameters
+					// - REFIID riid
+					// - __RPC__deref_out  void **ppvObject
+					prevParam := parameters[ind-1]
+					if prevParam.TypeInfo.Ident == "REFIID" {
+						continue
+					}
+				}*/
+			}
 			if param.IsArrayLen {
 				// Skip as Go users dont need to pass an array len
 				// they just pass a slice
 				continue
 			}
-			if param.IsOut {
-				if i != 0 {
-					b.WriteString(", ")
-				}
-				goType := param.TypeInfo.GoType
-				if len(goType) > 0 && goType[0] == '*' {
-					goType = goType[1:]
-				}
-				b.WriteString(param.Name)
-				b.WriteRune(' ')
-				b.WriteString(goType)
-				i++
+			if i != 0 {
+				b.WriteString(", ")
 			}
+			goType := param.TypeInfo.GoType
+			if len(goType) > 0 && goType[0] == '*' {
+				// Remove parameter so that
+				// - **d3d11.Device becomes *d3d11.Device
+				goType = goType[1:]
+			}
+			b.WriteString(param.Name)
+			b.WriteRune(' ')
+			b.WriteString(goType)
+			i++
 		}
 		if i > 0 {
 			b.WriteString(", ")
 		}
 	}
-	if outParam != nil {
-		b.WriteString("r ")
-		b.WriteString(interfaceWithGuid)
-	} else {
-		b.WriteString("err Error")
-	}
+	b.WriteString("err Error")
 	b.WriteString(")")
 }
 
@@ -407,6 +427,32 @@ func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) 
 	}
 	return i
 }*/
+
+func printParameterInitVars(b *bytes.Buffer, parameters []types.StructField) {
+	// Write init vars
+	for _, param := range parameters {
+		if param.IsDeref {
+			refName := param.Name + "Ref"
+			pointerName := param.Name + "Pointer"
+
+			b.WriteString("\t")
+			b.WriteString(refName)
+			b.WriteString(" := ")
+			b.WriteString("reflect.ValueOf(")
+			b.WriteString(param.Name)
+			b.WriteString(")\n")
+			b.WriteString("\tif " + refName + ".Kind() != reflect.Ptr {\n")
+			b.WriteString("\t\tpanic(\"Expected a pointer\")\n")
+			b.WriteString("\t}\n")
+			b.WriteString("\t")
+			b.WriteString(pointerName)
+			b.WriteString(" := ")
+			b.WriteString(refName)
+			b.WriteString(".Pointer()\n")
+			b.WriteString("\n")
+		}
+	}
+}
 
 func printStructFields(b *bytes.Buffer, fields []types.StructField) {
 	if len(fields) == 0 {

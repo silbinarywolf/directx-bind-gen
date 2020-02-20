@@ -1,16 +1,32 @@
 package types
 
+import (
+	"strconv"
+)
+
 type Project struct {
 	Files []File
 }
 
 type Value struct {
-	// RawValue is the value as it appears in C-code
-	RawValue string
 	// UInt32Value is set if the value is an uint32 type
 	UInt32Value *uint32
 	// StringValue is set if the value is a string type
 	StringValue *string
+	// RawValue is the value as it appears in C-code, this is
+	// used in code generation if we can't compute the value
+	RawValue string
+}
+
+// String will get the value that
+func (v *Value) String() string {
+	if v.UInt32Value != nil {
+		return strconv.FormatUint(uint64(*v.UInt32Value), 10)
+	}
+	if v.StringValue != nil {
+		return *v.StringValue
+	}
+	return v.RawValue
 }
 
 type File struct {
@@ -18,8 +34,13 @@ type File struct {
 	Structs     []Struct
 	Functions   []Function
 	TypeAliases []TypeAlias
-	VtblStructs []Struct
 	Enums       []Enum
+	Macros      []Macro
+}
+
+type Macro struct {
+	Ident string
+	Value
 }
 
 type Function struct {
@@ -37,22 +58,31 @@ type Struct struct {
 	Ident  string
 	Fields []StructField
 
-	// For Vtbl structs only
-	NonVtblIdent string
+	// Vtbl for the struct
+	VtblStruct *Struct
+
+	// GUID string for the struct (applies only COM interface types)
+	GUID string
 }
 
 type StructField struct {
-	TypeInfo TypeInfo
-	Name     string
+	Name string
 
-	// IsOut is true when the field has an __out
-	// annotation before it
+	// IsOut is true when the field has an __out annotation
 	IsOut bool
 	// HasECount is true when the field has an __in_ecount_opt
 	// field, this normally means the next field is a UINT
 	// representing how many are in an array
-	HasECount  bool
+	HasECount bool
+	// IsArray is when the field is most likely a dynamic array
+	IsArray bool
+	// IsArrayLen is true when field(s) are meant to represent
+	// the length of an array of data.
 	IsArrayLen bool
+	// IsDeref is true when a field has a __deref annotation
+	IsDeref bool
+
+	TypeInfo TypeInfo
 }
 
 type Enum struct {
@@ -66,8 +96,11 @@ type EnumField struct {
 }
 
 type TypeInfo struct {
-	Name  string
-	Type  Type
+	// Name is the name of the type.  "Basic", "Pointer"
+	Name string
+	// Type is the type information
+	Type Type
+	// Ident is the type parsed from .h file
 	Ident string
 	// GoType is generated based on type
 	GoType string
@@ -82,10 +115,11 @@ type BasicType struct {
 
 func (*BasicType) isType() {}
 
-func NewBasicType(data BasicType) TypeInfo {
+func NewBasicType(ident string, data BasicType) TypeInfo {
 	return TypeInfo{
-		Name: "Basic",
-		Type: &data,
+		Name:  "Basic",
+		Ident: ident,
+		Type:  &data,
 	}
 }
 
@@ -95,10 +129,11 @@ type Array struct {
 
 func (*Array) isType() {}
 
-func NewArray(data Array) TypeInfo {
+func NewArray(ident string, data Array) TypeInfo {
 	return TypeInfo{
-		Name: "Array",
-		Type: &data,
+		Name:  "Array",
+		Ident: ident,
+		Type:  &data,
 	}
 }
 
@@ -130,15 +165,34 @@ func NewFunctionPointer(data FunctionPointer) TypeInfo {
 }
 
 type Pointer struct {
-	TypeInfo TypeInfo
 	Depth    int
+	TypeInfo TypeInfo
 }
 
 func (*Pointer) isType() {}
 
-func NewPointer(data Pointer) TypeInfo {
+func NewPointer(ident string, data Pointer) TypeInfo {
 	return TypeInfo{
-		Name: "Pointer",
-		Type: &data,
+		Name:  "Pointer",
+		Ident: ident,
+		Type:  &data,
 	}
+}
+
+func IsECountArray(param *StructField) bool {
+	//fmt.Printf("param: %s\n", param.Name)
+	if param.Name == "ppRenderTargetViews" {
+		return false
+	}
+	typeInfo, ok := param.TypeInfo.Type.(*Pointer)
+	if !ok {
+		return false
+	}
+	switch typeInfo.Depth {
+	case 1:
+		return true
+	case 2:
+		return true
+	}
+	return false
 }
