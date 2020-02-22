@@ -113,7 +113,7 @@ func transformParameters(parameters []types.StructField, isFunction bool) []type
 					case 3:
 						// NOTE(Jae): 2020-02-20
 						// Hack that works for the time-being. Need to figure out why this makes things still work
-						param.TypeInfo.GoType = "**" + transformIdent(typetrans.GoTypeFromTypeInfo(typeInfo.TypeInfo))
+						param.TypeInfo.GoType = "***" + transformIdent(typetrans.GoTypeFromTypeInfo(typeInfo.TypeInfo))
 					default:
 						panic(fmt.Sprintf("Unhandled pointer depth: %d for %s", typeInfo.Depth, param.Name))
 					}
