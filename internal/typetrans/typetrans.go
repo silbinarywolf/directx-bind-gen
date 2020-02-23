@@ -68,6 +68,12 @@ func GoTypeFromTypeInfo(typeInfo types.TypeInfo) string {
 	if typeTranslation, ok := builtInTypeTranslation[ident]; ok {
 		ident = typeTranslation.GoType
 	} else {
+		// Hack to ignore tokens I dont care about
+		// ie. handle this case for params
+		//interface ID3D10DeviceChild
+		//{
+		//     CONST_VTBL struct ID3D10DeviceChildVtbl *lpVtbl;
+		// };
 		ident = strings.Replace(ident, "CONST_VTBL struct ", "", 1)
 	}
 	return ident

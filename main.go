@@ -21,14 +21,16 @@ func main() {
 	}
 	defer f.Close()
 
+	const dir = "DXSDK_Jun10/include/"
 	files := []string{
-		"DXSDK_Jun10/include/D3D11.h",
-		"DXSDK_Jun10/include/DXGI.h",
-		"DXSDK_Jun10/include/DXGIType.h",
-		"DXSDK_Jun10/include/D3Dcommon.h",
-		"DXSDK_Jun10/include/DXGIFormat.h",
-		"DXSDK_Jun10/include/D3D11SDKLayers.h",
-		"DXSDK_Jun10/include/D3D11Shader.h",
+		"D3D11.h",
+		"DXGI.h",
+		"DXGIType.h",
+		"D3Dcommon.h",
+		"DXGIFormat.h",
+		"D3D11SDKLayers.h",
+		"D3D11Shader.h",
+		"D3Dcompiler.h",
 	}
 
 	// Get project
@@ -45,16 +47,19 @@ func main() {
 				Ident: "HMODULE",
 				Alias: "uintptr",
 			},
-			/*{
-				Ident: "BOOL",
-				Alias: "uint32",
-			},
 			{
-				Ident: "FLOAT",
-				Alias: "float32",
-			},*/
+				// Not sure how to best handle this, so going to assume it takes any pointer for now
+				//DECLARE_INTERFACE(ID3DInclude)
+				//{
+				//  STDMETHOD(Open)(THIS_ D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes) PURE;
+				//  STDMETHOD(Close)(THIS_ LPCVOID pData) PURE;
+				//};
+				Ident: "ID3DInclude",
+				Alias: "uintptr",
+			},
 		}...)
 		file.Structs = append(file.Structs, []types.Struct{
+			// Provide data types from Windows APIs
 			{
 				// guid describes a structure used to describe an identifier for a MAPI interface.
 				// https://docs.microsoft.com/en-us/office/client-developer/outlook/mapi/iid
@@ -119,6 +124,7 @@ func main() {
 		project.Files = append(project.Files, file)
 	}
 	for _, filename := range files {
+		filename = dir + filename
 		file := parser.ParseFile(filename)
 		project.Files = append(project.Files, file)
 	}

@@ -25,6 +25,7 @@ var precedence = map[string]int{
 	// otherwise DXGI_USAGE_SHADER_INPUT ends up not being expected 16
 	// (im unsure of if this means the parentheses are handled incorrectly
 	// but whatever for this use-case for now)
+	"|":  4,
 	"<<": 4,
 	">>": 4,
 	"+":  5,
@@ -49,13 +50,15 @@ func OperatorPrecedence(operator string) int {
 }
 
 func IsOperator(operator string) bool {
-	c := operator[0]
-	return c == '<' ||
-		c == '+' ||
-		c == '-' ||
-		operator == "<<" ||
-		operator == ">>" ||
-		operator == "++"
+	_, ok := precedence[operator]
+	return ok
+	/*return c == '<' ||
+	c == '+' ||
+	c == '-' ||
+	operator == "<<" ||
+	operator == ">>" ||
+	operator == "++" ||
+	operator == "|"*/
 }
 
 func IsNumber(str string) bool {
@@ -126,6 +129,16 @@ MainLoop:
 				if constIdent == "IID_ID3DBlob" {
 					// Ignore cases like:
 					// - #define IID_ID3DBlob IID_ID3D10Blob
+					continue
+				}
+				if constIdent == "D3DCOMPILER_DLL_W" ||
+					constIdent == "D3DCOMPILER_DLL_A" ||
+					constIdent == "D3DCOMPILER_DLL" {
+					// Ignore cases like:
+					// - #define D3DCOMPILER_DLL_W L"d3dcompiler_43.dll"
+					// - #define D3DCOMPILER_DLL_A "d3dcompiler_43.dll"
+					//
+					// Might just need a rule to ignore certain strings?
 					continue
 				}
 				// A few cases to handle:
@@ -321,6 +334,9 @@ MainLoop:
 							result := uint64(leftValueFloat64) << uint64(rightValueFloat64)
 							//fmt.Printf("result: %d for const: %s\n", result, constIdent)
 							stack = append(stack, fmt.Sprintf("%d", result))
+						case "|":
+							result := uint64(leftValueFloat64) | uint64(rightValueFloat64)
+							stack = append(stack, fmt.Sprintf("%d", result))
 						default:
 							panic("TODO: handle operator'ing two values together:\n" + leftValue + " " + t + " " + rightValue + " for #define: " + constIdent)
 						}
@@ -396,6 +412,7 @@ MainLoop:
 				if t := s.TokenText(); t != "{" {
 					continue
 				}
+				lastValue := uint32(0)
 				data := types.Enum{}
 				for {
 					s.Scan()
@@ -405,29 +422,39 @@ MainLoop:
 						break
 					}
 					s.Scan() // =
-					if tok := s.TokenText(); tok != "=" {
-						panic(s.String() + ": unexpected token: " + tok + " after enum field value: " + kind)
-					}
-					s.Scan()
-					rawValue, isEndOfEnum := parseEnumExpr(&s, name)
-					enumField := types.EnumField{
-						Ident: kind,
-					}
-					enumField.RawValue = rawValue
-					if evalValue := tryEvaluateExpr(rawValue); evalValue != nil {
-						switch value := evalValue.(type) {
-						case string:
-							enumField.StringValue = &value
-						case uint32:
-							enumField.UInt32Value = &value
-						default:
-							panic(fmt.Sprintf("Unhandled evaluated expression type: %T", value))
+					tok := s.TokenText()
+					if tok == "=" {
+						s.Scan()
+						rawValue, isEndOfEnum := parseEnumExpr(&s, name)
+						enumField := types.EnumField{
+							Ident: kind,
 						}
+						enumField.RawValue = rawValue
+						if evalValue := tryEvaluateExpr(rawValue); evalValue != nil {
+							switch value := evalValue.(type) {
+							case string:
+								enumField.StringValue = &value
+							case uint32:
+								enumField.UInt32Value = &value
+								lastValue = *enumField.UInt32Value
+							default:
+								panic(fmt.Sprintf("Unhandled evaluated expression type: %T", value))
+							}
+						}
+						data.Fields = append(data.Fields, enumField)
+						if isEndOfEnum {
+							break
+						}
+						continue
+					} else if tok == "," {
+						lastValue++
+						enumField := types.EnumField{
+							Ident: kind,
+						}
+						enumField.UInt32Value = &lastValue
+						continue
 					}
-					data.Fields = append(data.Fields, enumField)
-					if isEndOfEnum {
-						break
-					}
+					panic(s.String() + ": unexpected token: = or , but got " + tok + " after enum field value: " + kind)
 				}
 				s.Scan()
 				data.Ident = s.TokenText()
@@ -444,11 +471,12 @@ MainLoop:
 				//fmt.Printf("struct: %s\nkind: %s\n", name, kind)
 
 				// Get struct fields
-				data := types.Struct{
-					Ident: name,
-				}
+				data := types.Struct{}
 				data.Fields = parseStructFields(&s)
-				s.Scan() // Scan and get struct name again
+				s.Scan()
+				// Scan and get proper struct name. (ie. "typedef struct _MyStruct {} MyStruct;")
+				// I say proper because the last one is what we generally want.
+				data.Ident = s.TokenText()
 				s.Scan() // ;
 				if tok := s.TokenText(); tok != ";" {
 					panic(s.String() + ": unexpected token: " + tok + " at end of struct: " + data.Ident + "expected ;")
@@ -709,6 +737,12 @@ FieldLoop:
 			v := s.TokenText()
 			s.Scan()
 			switch v {
+			case "interface":
+				// We skip this as we dont need this info to be captured for now
+				//
+				// Handle case in D3Dcompiler.h
+				// - D3DDisassemble10Effect(__in interface ID3D10Effect *pEffect,
+				continue
 			case "const", "CONST":
 				// Handle alternate "const" case where it
 				// comes after the type rather than before

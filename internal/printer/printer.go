@@ -75,6 +75,7 @@ var (
 					continue
 				}
 				if strings.HasSuffix(ident, "_H_VERSION__") {
+					// ignore version macros, not needed for anything
 					continue
 				}
 				value := record.Value.String()

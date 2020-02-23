@@ -121,6 +121,13 @@ func transformParameters(parameters []types.StructField, isFunction bool) []type
 			}
 		}
 
+		// docs say its a 32-bit pointer, but sizeof(LPCVOID) is 8-bytes with 64-bit VS2015
+		// - https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/66996877-9dd4-477d-a811-30e6c1a5525d
+		switch param.TypeInfo.Ident {
+		case "LPCVOID":
+			param.IsDeref = true
+		}
+
 		switch typeInfo := param.TypeInfo.Type.(type) {
 		case *types.Pointer:
 			//if param.TypeInfo.GoType == "uintptr" {
@@ -131,8 +138,11 @@ func transformParameters(parameters []types.StructField, isFunction bool) []type
 				switch param.TypeInfo.Ident {
 				case "ID3D11Resource": // Resource would ideally convert to a custom interface for Golang, but this is lazier/quicker
 					param.IsDeref = true
+				case "ID3D10Effect": // Should probably also be a custom interface, but will just make it tagged as interface{} for Go
+					param.IsDeref = true
 				}
 			case 2:
+				// Convert C pointer types to our Golang equivalent
 				switch param.TypeInfo.Ident {
 				case "void",
 					"IUnknown":
