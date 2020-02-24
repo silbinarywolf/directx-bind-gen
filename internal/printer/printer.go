@@ -340,6 +340,7 @@ func printParametersAndReturns(b *bytes.Buffer, parameters []types.StructField) 
 			if i != 0 {
 				b.WriteString(", ")
 			}
+
 			if param.IsDeref {
 				b.WriteString(param.Name)
 				b.WriteRune(' ')
@@ -465,7 +466,12 @@ func printStructFields(b *bytes.Buffer, fields []types.StructField) {
 			b.WriteString(field.Name)
 			b.WriteRune(' ')
 		}
-		b.WriteString(field.TypeInfo.GoType)
+		if field.IsDeref {
+			b.WriteString("uintptr")
+		} else {
+			b.WriteString(field.TypeInfo.GoType)
+		}
+
 		b.WriteRune('\n')
 	}
 }

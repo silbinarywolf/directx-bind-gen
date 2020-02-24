@@ -163,9 +163,16 @@ func transformIdent(ident string) string {
 		ident = ident[1:]
 		pointerDepth++
 	}*/
+	// Remove DX11 namespace
 	ident = strings.ReplaceAll(ident, "ID3D11", "")
 	ident = strings.ReplaceAll(ident, "D3D11_", "")
 	ident = strings.ReplaceAll(ident, "D3D11", "")
+	// Remove DX10 namespace
+	ident = strings.ReplaceAll(ident, "D3D10_1_", "")
+	ident = strings.ReplaceAll(ident, "ID3D10", "")
+	ident = strings.ReplaceAll(ident, "D3D10_", "")
+	ident = strings.ReplaceAll(ident, "D3D10", "")
+
 	ident = strings.ReplaceAll(ident, "D3D_", "")
 	/*for pointerDepth > 0 {
 		ident = "*" + ident

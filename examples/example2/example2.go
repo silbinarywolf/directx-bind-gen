@@ -286,8 +286,21 @@ func openWindow(
 	return window, nil
 }
 
-func compileShaderFromFile(filename string, entryPoint uintptr) {
+func compileShaderFromFile(filename string, entryPoint string, shaderModel string) *d3d11.Blob {
 	shaderFlags := d3d11.D3DCOMPILE_ENABLE_STRICTNESS
+
+	// Debug
+	shaderFlags |= d3d11.D3DCOMPILE_DEBUG
+
+	// Debug: Disable optimizations to further improve shader debugging
+	shaderFlags |= d3d11.D3DCOMPILE_SKIP_OPTIMIZATION
+
+	var errorBlob *d3d11.Blob
+	err := d3d11.D3DCompileFromFile(szFileName, nullptr, nullptr, szEntryPoint, szShaderModel, shaderFlags, 0, ppBlobOut, &pErrorBlob)
+	if err != nil {
+		panic(err)
+	}
+	return errorBlob
 	/*
 		HRESULT CompileShaderFromFile( const WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut )
 		{
